@@ -8,7 +8,8 @@ function App() {
   const [active, setActive] = useState(0)
   const [panes, setPanes] = useState([{name:'Panel 1', text:''}])
   const [currentText, setCurrentText] = useState(panes[active].text)
-  const [consola, setConsola] = useState('Hola.')
+  const [consola, setConsola] = useState('')
+  const [file, setFile] = useState(null)
   const add = ()=>{
     let newPanes = panes
     setPaneCount(parseInt(paneCount)+1)
@@ -56,10 +57,11 @@ function App() {
             </Header>
             <Menu inverted borderless className="Nav">
                 <Menu.Item className='opcion'>
-                <input type="file" class="inputfile" onChange={
+                <input type="file" class="inputfile" accept='.ty' onChange={
                   (e)=>{
                     if (e.target.files[0]!=null){
                       let reader = new FileReader()
+                      console.log()
                       reader.readAsText(e.target.files[0], "UTF-8")
                       reader.onload=(a)=>{
                       setCurrentText(a.target.result)
@@ -124,7 +126,7 @@ function App() {
                     </Header>
                   </Segment>
                   <Form>
-                    <TextArea disabled value={consola} style={{minHeight:570, maxHeight:570}}/>
+                    <TextArea disabled value={consola} style={{minHeight:555, maxHeight:570}}/>
                   </Form>
                 </Grid.Column>
               </Grid.Row>

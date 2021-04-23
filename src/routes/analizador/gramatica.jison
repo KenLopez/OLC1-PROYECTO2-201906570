@@ -1,3 +1,8 @@
+%{
+   
+%}
+
+
 /*Analizador Léxico*/
 
 %lex
@@ -62,14 +67,37 @@
 
 /lex
 
+%start INICIO
 
- %{
+%%/*Gramática*/
 
- %}
+INICIO
+   :BLOQUE EOF
+   |EOF
+;
 
- %start INICIO
+BLOQUE
+   :llavea BLOQUE2
+;
 
- %%/*Gramática*/
+BLOQUE2
+   :INSTRUCCION BLOQUE2
+   |llavec
+;
 
- INICIO
-    :EOF;
+INSTRUCCION
+   :DECLARACION INSTRUCCION
+   |FUNCION INSTRUCCION
+   |PRINT INSTRUCCION
+;
+
+PRINT 
+   :print parena VALUE parenc ptcoma
+;
+
+VALUE
+   :num
+   |cadena
+;
+
+
