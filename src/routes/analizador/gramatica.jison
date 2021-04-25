@@ -45,7 +45,7 @@
 ","                                             return 'coma';
 "^"                                             return 'elevado';
 "["                                             return 'corchetea';
-"]"                                             return 'corchetec'
+"]"                                             return 'corchetec';
 
 /*Reservadas*/
 "int"                                           return 'tint';
@@ -102,8 +102,30 @@
 %%/*Gramática*/
 
 INICIO
-   :INSTRUCCIONES EOF
+   :GLOBALES EOF
    |EOF
+;
+
+
+/*BLOQUE GLOBAL*/
+GLOBALES
+   :GLOBALES GLOBAL
+   |GLOBAL
+;
+
+GLOBAL
+   :DECLARACION SYNC
+   |ASIGNACION SYNC
+   |METODO
+   |IF
+   |SWITCH
+   |WHILE
+   |DOWHILE
+   |FOR
+   |PRINT SYNC
+   |OPTERNARIO SYNC
+   |LLAMADA SYNC
+   |MAIN
 ;
 
 INSTRUCCIONES
@@ -114,28 +136,15 @@ INSTRUCCIONES
 INSTRUCCION
    :DECLARACION SYNC
    |ASIGNACION SYNC
-   //|METODO
    |IF
    |SWITCH
    |WHILE
-   //|DOWHILE
-   //|FOR
+   |DOWHILE
+   |FOR
    |PRINT SYNC
    |OPTERNARIO SYNC
-   |id incremento SYNC
-   |id decremento SYNC
-   //|LLAMADA SYNC
+   |LLAMADA SYNC
 ;
-
-/*LLAMADA
-   :id parena VALORES parenc
-   |id parena parenc
-;*/
-
-/*VALLAMADA
-   :VALLAMADA coma EXPLOG
-   |EXPLOG
-;*/
 
 BLOQUE
    :llavea BLOQUE2
@@ -146,11 +155,13 @@ BLOQUE2
    |llavec
 ;
 
+/*FUNCIONES NATIVAS*/
 PRINT 
    :print parena EXPRL parenc 
    |print parena parenc
 ;
 
+/*VARIABLES*/
 DECLARACION
    :TYPE id
    |TYPE id igual EXPRL
@@ -159,11 +170,6 @@ DECLARACION
    |TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
 ;
 
-/*LISTAVALORES
-   :LISTAVALORES coma EXPRL
-   |EXPRL
-;*/
-
 CASTEO
    :parena TYPE parenc
 ;
@@ -171,6 +177,8 @@ CASTEO
 ASIGNACION
    :id igual EXPRL
    |id igual CASTEO EXPRL
+   |id incremento SYNC
+   |id decremento SYNC
 ;
 
 TYPE
@@ -181,24 +189,53 @@ TYPE
    |tchar SYNC
 ;
 
+/*SIGNO DE SINCRONIZACIÓN*/
 SYNC
    :ptcoma
 ;
 
-/*METODO
-   :void id parena PARAM parenc BLOQUE
-   |void id parena parenc BLOQUE
-;*/
 
-/*PARAM
+/*FUNCIONES*/
+MAIN
+   :ex LLAMADA
+;
+
+METODO
+   :tmethod id parena PARAM parenc BLOQUE
+   |tmethod id parena parenc BLOQUE
+;
+
+PARAM
    :PARAM coma TYPE id
    |TYPE id 
-;*/
+;
 
-/*WHILE 
-   :
-;*/
+LLAMADA
+   :id parena LISTAVALORES parenc
+   |id parena parenc
+;
 
+LISTAVALORES
+   :LISTAVALORES coma EXPRL
+   |EXPRL
+;
+
+/*CICLOS*/
+WHILE 
+   :mientras EXPRL llavea INSTRUCCIONES llavec
+;
+
+DOWHILE
+   :do llavea INSTRUCCIONES llavec mientras parena EXPRL parenc SYNC
+;
+
+FOR 
+   :para parena ASIGNACION SYNC EXPLR SYNC ASIGNACION parenc llavea INSTRUCCIONES llavec
+   |para parena DECLARACION SYNC EXPLR SYNC ASIGNACION parenc llavea INSTRUCCIONES llavec
+;
+
+
+/*SENTENCIAS DE CONTROL Y OPERADOR TERNARIO*/
 OPTERNARIO
    :EXPRL interrog EXPRL dospt EXPRL
 ;
@@ -238,6 +275,8 @@ BREAK
    :romper SYNC
 ;
 
+
+/*EXPRESIONES Y VALORES*/
 EXPRL
    :EXPRL ologico EXPRL
    |EXPRL2
