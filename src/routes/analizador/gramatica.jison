@@ -15,7 +15,6 @@
 "\\".*                                          //Comentario
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]             //Comentario bloque
 
-
 /*Signos*/
 "+"                                             return 'mas';
 "++"                                            return 'incremento';
@@ -52,6 +51,7 @@
 "double"                                        return 'tdouble';
 "boolean"                                       return 'tbool';
 "char"                                          return 'tchar';
+"list"                                          return 'tlista';
 "string"                                        return 'tstring';
 "print"                                         return 'print';
 "true"                                          return 'vtrue';
@@ -69,6 +69,15 @@
 "return"                                        return 'retorno';
 "new"                                           return 'nuevo';
 "break"                                         return 'romper';
+"continue"                                      return 'continuar';
+"toLower"                                       return 'minusculas';
+"toUpper"                                       return 'mayusculas';
+"length"                                        return 'tamanio';
+"truncate"                                      return 'truncar';
+"round"                                         return 'redondear';
+"typeOf"                                        return 'typeOf';
+"toString"                                      return 'acadena';
+"toCharArray"                                   return 'aarreglo';
 
 /*Valores*/
 \'[[a-zA-Z0-9]]|[\\]|[\\\']|[\\\"]|[\\n]|[\\t]|[\\r]]\'  {yytext=yytext.substr(1,yyleng-2);return'caracter';}
@@ -116,7 +125,7 @@ GLOBALES
 GLOBAL
    :DECLARACION SYNC
    |ASIGNACION SYNC
-   |METODO
+   |FUNCION
    |IF
    |SWITCH
    |WHILE
@@ -128,6 +137,7 @@ GLOBAL
    |MAIN
 ;
 
+/*BLOQUE LOCAL*/
 INSTRUCCIONES
    :INSTRUCCIONES INSTRUCCION
    |INSTRUCCION
@@ -136,6 +146,7 @@ INSTRUCCIONES
 INSTRUCCION
    :DECLARACION SYNC
    |ASIGNACION SYNC
+   |TRANSFERENCIA SYNC
    |IF
    |SWITCH
    |WHILE
@@ -161,6 +172,17 @@ PRINT
    |print parena parenc
 ;
 
+NATIVA
+   :minusculas parena EXPRL parenc
+   |mayusculas parena EXPLR parenc
+   |tamanio parena EXPLR parenc
+   |truncar parena EXPLR parenc
+   |redondear parena EXPLR parenc
+   |typeOf parena EXPLR parenc
+   |toString parena EXPLR parenc
+   |toCharArray parena EXPLR parenc
+;
+
 /*VARIABLES*/
 DECLARACION
    :TYPE id
@@ -168,6 +190,7 @@ DECLARACION
    |TYPE id igual CASTEO EXPRL
    |TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
    |TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
+   |tlista TYPE id igual nuevo tlista menor TYPE mayor         //Lista
 ;
 
 CASTEO
@@ -177,16 +200,26 @@ CASTEO
 ASIGNACION
    :id igual EXPRL
    |id igual CASTEO EXPRL
-   |id incremento SYNC
-   |id decremento SYNC
+   |id incremento 
+   |id decremento 
+   |ACCESOVECTOR igual EXPLR 
+   |ACCESOLISTA igual EXPLR 
 ;
 
 TYPE
-   :tint SYNC
-   |tstring SYNC
-   |tdouble SYNC
-   |tboolean SYNC
-   |tchar SYNC
+   :tint 
+   |tstring 
+   |tdouble 
+   |tboolean
+   |tchar 
+;
+
+ACCESOVECTOR
+   :id corchetea EXPLR corchetec 
+;
+
+ACCESOLISTA
+   :id corchetea corchetea EXPLR corchetec corchetec
 ;
 
 /*SIGNO DE SINCRONIZACIÓN*/
@@ -200,16 +233,6 @@ MAIN
    :ex LLAMADA
 ;
 
-METODO
-   :tmethod id parena PARAM parenc BLOQUE
-   |tmethod id parena parenc BLOQUE
-;
-
-PARAM
-   :PARAM coma TYPE id
-   |TYPE id 
-;
-
 LLAMADA
    :id parena LISTAVALORES parenc
    |id parena parenc
@@ -218,6 +241,18 @@ LLAMADA
 LISTAVALORES
    :LISTAVALORES coma EXPRL
    |EXPRL
+;
+
+FUNCION
+   :TYPE id parena PARAM parenc BLOQUE
+   |TYPE id parena parenc BLOQUE
+   |tmethod id parena PARAM parenc BLOQUE
+   |tmethod id parena parenc BLOQUE
+;
+
+PARAM
+   :PARAM coma TYPE id
+   |TYPE id 
 ;
 
 /*CICLOS*/
@@ -230,8 +265,14 @@ DOWHILE
 ;
 
 FOR 
-   :para parena ASIGNACION SYNC EXPLR SYNC ASIGNACION parenc llavea INSTRUCCIONES llavec
-   |para parena DECLARACION SYNC EXPLR SYNC ASIGNACION parenc llavea INSTRUCCIONES llavec
+   :para parena ASIGNACION dospt EXPLR dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
+   |para parena DECLARACION dospt EXPLR dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
+;
+
+TRANSFERENCIA
+   :retorno 
+   |continuar 
+   |romper 
 ;
 
 
@@ -263,16 +304,10 @@ SWITCH
 CASES
    :CASES caso dospt INSTRUCCIONES
    |caso dospt INSTRUCCIONES
-   |caso dospt INSTRUCCIONES BREAK
 ;
 
 DEFAULT
    :defecto dospt INSTRUCCIONES
-   |defecto dospt INSTRUCCIONES BREAK
-;
-
-BREAK
-   :romper SYNC
 ;
 
 
@@ -329,5 +364,9 @@ EXPVAL
    |vtrue
    |vfalse
    |id
+   |ACCESOVECTOR
+   |ACCESOLISTA
+   |NATIVA
+   |LLAMADA
 ;
 
