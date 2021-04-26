@@ -2,6 +2,7 @@ import './App.css';
 import { Header, Menu, Segment, Image, Button, Grid, TextArea, Form, Icon } from 'semantic-ui-react';
 import Footer from './components/Footer'
 import { useState } from 'react';
+const axios = require('axios').default
 
 function App() {
   const [paneCount, setPaneCount] = useState(2)
@@ -10,6 +11,14 @@ function App() {
   const [currentText, setCurrentText] = useState(panes[active].text)
   const [consola, setConsola] = useState('')
   const [file, setFile] = useState(null)
+  var compilar = ()=>{
+    console.log('HELP')
+    async function enviar(){
+        let res = await axios.post("http://localhost:3000/compilar", {codigo: currentText});
+        console.log(res)    
+    }
+    enviar()
+  }
   const add = ()=>{
     let newPanes = panes
     setPaneCount(parseInt(paneCount)+1)
@@ -79,7 +88,7 @@ function App() {
                   <Button color='green'>Guardar</Button>
                 </Menu.Item>
                 <Menu.Item className='opcion'>
-                  <Button color='yellow'>Compilar</Button> 
+                  <Button color='yellow' onClick={compilar}>Compilar</Button> 
                 </Menu.Item>
                 <Menu.Item className='opcion'>
                   <Button color='orange'>Reporte</Button>
@@ -126,7 +135,7 @@ function App() {
                     </Header>
                   </Segment>
                   <Form>
-                    <TextArea disabled value={consola} style={{minHeight:555, maxHeight:570}}/>
+                    <TextArea disabled value={consola} style={{minHeight:555, maxHeight:555}}/>
                   </Form>
                 </Grid.Column>
               </Grid.Row>

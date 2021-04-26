@@ -1,8 +1,3 @@
-%{
-   
-%}
-
-
 /*Analizador Léxico*/
 
 %lex

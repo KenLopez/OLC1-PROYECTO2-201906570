@@ -1,9 +1,14 @@
 var express = require('express');
-var parser = require('./analizador/gramatica')
+var router = express.Router();
+var parser = require('./analizador/gramatica');
 
 /* GET users listing. */
-router.post('/parse', function(req, res, next) {
-  res.send('respond with a resource');
-});
-
+router.post('/compilar', function(req, res, next){
+  try {
+    //var program = parser.parse(req.body.codigo)
+    res.send('Compiló :D')
+  } catch (error) {
+    res.send('No Compiló D:')
+  }
+})
 module.exports = router;
