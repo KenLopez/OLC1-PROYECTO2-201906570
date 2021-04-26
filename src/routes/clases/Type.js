@@ -1,7 +1,7 @@
 const Type = {
     STRING:     'STRING',
     INT:        'INT',
-    BOOL:       'BOOLEAN',
+    BOOLEAN:    'BOOLEAN',
     CHAR:       'CHAR',
     FUNCTION:   'FUNCTION',
     EXPRESION:  'EXPRESION',
@@ -27,5 +27,7 @@ const Type = {
     NATIVA:     'NATIVA',
     ASINACION:  'ASIGNACION',
     DECLARACION:'DELARACION',
-    PRINT:      'PRINT', 
+    PRINT:      'PRINT',
+    NUMERICO:    'NUMERICO', 
 }
+module.exports = Type;

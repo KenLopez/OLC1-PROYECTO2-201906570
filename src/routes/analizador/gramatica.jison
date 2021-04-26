@@ -1,3 +1,11 @@
+%{
+   const Value = require('../clases/Value.js')
+   const Type = require('../clases/Type.js')
+   const Global = require('../clases/Global.js')
+   const Print = require('../clases/Print.js')
+   var program = new Global()
+%}
+
 /*Analizador Léxico*/
 
 %lex
@@ -7,26 +15,26 @@
 %%
 
 \s+                                             //Espacios
-"\\".*                                          //Comentario
-[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]             //Comentario bloque
+"//".*                                      //Comentario unilinea
+[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]         //Comentario multilinea
 
 /*Signos*/
-"+"                                             return 'mas';
 "++"                                            return 'incremento';
-"-"                                             return 'menos';
+"+"                                             return 'mas';
 "--"                                            return 'decremento';
+"-"                                             return 'menos';
 "*"                                             return 'por';
 "/"                                             return 'dividido';
 "^"                                             return 'elevado';
 "%"                                             return 'modulo';
-"="                                             return 'igual';
 "=="                                            return 'equals';
-"!"                                             return 'exclamacion';
+"="                                             return 'igual';
 "!="                                            return 'diferente';
-"<"                                             return 'menor';
-"<="                                            return 'menorigual';
-">"                                             return 'mayor';
+"!"                                             return 'exclamacion';
 ">="                                            return 'mayorigual';
+"<="                                            return 'menorigual';
+"<"                                             return 'menor';
+">"                                             return 'mayor';
 "?"                                             return 'interrog';
 ":"                                             return 'dospt';
 ";"                                             return 'ptcoma';
@@ -74,11 +82,12 @@
 "toString"                                      return 'acadena';
 "toCharArray"                                   return 'aarreglo';
 
-/*Valores*/
-\'[[a-zA-Z0-9]]|[\\]|[\\\']|[\\\"]|[\\n]|[\\t]|[\\r]]\'  {yytext=yytext.substr(1,yyleng-2);return'caracter';}
-\"[[^\"]|[\\\""]]*\"                                     {yytext=yytext.substr(1,yyleng-2);return'cadena';}
-[0-9]+("."[0-9]+)?\b                            return 'num';
-([a-zA-Z_])(a-zA-Z0-9_)*                        return 'id';
+/*Valores*/                                            
+([0-9])+(["."])([0-9])+                         return 'decimal';
+([0-9])+                                        return 'entero';  
+([a-zA-Z_])([a-zA-Z0-9_])*                      return 'id';
+["\""]([^"\""])*["\""]                          return'cadena';
+["\'"]([^"\'"])*["\'"]                          return'caracter';
 
 <<EOF>>                                         return 'EOF';
 
@@ -106,7 +115,12 @@
 %%/*Gramática*/
 
 INICIO
-   :GLOBALES EOF
+   :GLOBALES EOF {
+      var p = program
+      program = new Global()
+      p.ejecutar()
+      return p;
+   }
    |EOF
 ;
 
@@ -126,10 +140,11 @@ GLOBAL
    |WHILE
    |DOWHILE
    |FOR
-   |PRINT SYNC
+   |PRINT SYNC {program.instrucciones.push($1)}
    |OPTERNARIO SYNC
    |LLAMADA SYNC
-   |MAIN
+   |MAIN SYNC
+   |error SYNC
 ;
 
 /*BLOQUE LOCAL*/
@@ -163,19 +178,19 @@ BLOQUE2
 
 /*FUNCIONES NATIVAS*/
 PRINT 
-   :print parena EXPRL parenc 
-   |print parena parenc
+   :print parena EXPRL parenc {$$ = new Print($3, null, Type.PRINT, this._$.first_line, this._$.first_column);}
+   |print parena parenc       {$$ = new Print(null, null, Type.PRINT, this._$.first_line, this._$.first_column);}
 ;
 
 NATIVA
    :minusculas parena EXPRL parenc
-   |mayusculas parena EXPLR parenc
-   |tamanio parena EXPLR parenc
-   |truncar parena EXPLR parenc
-   |redondear parena EXPLR parenc
-   |typeOf parena EXPLR parenc
-   |toString parena EXPLR parenc
-   |toCharArray parena EXPLR parenc
+   |mayusculas parena EXPRL parenc
+   |tamanio parena EXPRL parenc
+   |truncar parena EXPRL parenc
+   |redondear parena EXPRL parenc
+   |typeOf parena EXPRL parenc
+   |acadena parena EXPRL parenc
+   |aarreglo parena EXPRL parenc
 ;
 
 /*VARIABLES*/
@@ -185,7 +200,7 @@ DECLARACION
    |TYPE id igual CASTEO EXPRL
    |TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
    |TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
-   |tlista TYPE id igual nuevo tlista menor TYPE mayor         //Lista
+   |tlista TYPE id igual nuevo tlista menor TYPE mayor       
 ;
 
 CASTEO
@@ -197,8 +212,8 @@ ASIGNACION
    |id igual CASTEO EXPRL
    |id incremento 
    |id decremento 
-   |ACCESOVECTOR igual EXPLR 
-   |ACCESOLISTA igual EXPLR 
+   |ACCESOVECTOR igual EXPRL 
+   |ACCESOLISTA igual EXPRL 
 ;
 
 TYPE
@@ -210,11 +225,11 @@ TYPE
 ;
 
 ACCESOVECTOR
-   :id corchetea EXPLR corchetec 
+   :id corchetea EXPRL corchetec 
 ;
 
 ACCESOLISTA
-   :id corchetea corchetea EXPLR corchetec corchetec
+   :id corchetea corchetea EXPRL corchetec corchetec
 ;
 
 /*SIGNO DE SINCRONIZACIÓN*/
@@ -252,16 +267,16 @@ PARAM
 
 /*CICLOS*/
 WHILE 
-   :mientras EXPRL llavea INSTRUCCIONES llavec
+   :mientras parena EXPRL parenc BLOQUE
 ;
 
 DOWHILE
-   :do llavea INSTRUCCIONES llavec mientras parena EXPRL parenc SYNC
+   :do BLOQUE mientras parena EXPRL parenc SYNC
 ;
 
 FOR 
-   :para parena ASIGNACION dospt EXPLR dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
-   |para parena DECLARACION dospt EXPLR dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
+   :para parena ASIGNACION dospt EXPRL dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
+   |para parena DECLARACION dospt EXPRL dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
 ;
 
 TRANSFERENCIA
@@ -309,59 +324,44 @@ DEFAULT
 /*EXPRESIONES Y VALORES*/
 EXPRL
    :EXPRL ologico EXPRL
-   |EXPRL2
-;
-
-EXPRL2
-   :EXPRL2 ylogico EXPRL2
-   |EXPRL3
-;
-
-EXPRL3
-   :exclamacion EXPRL3
-   |EXP
-;
-
-EXP
-   :EXP equals EXP
-   |EXP diferente EXP
+   |EXPRL ylogico EXPRL
+   |exclamacion EXPRL
+   |EXPRL equals EXPRL
+   |EXPRL diferente EXPRL
+   |EXPRL menor EXPRL
+   |EXPRL mayor EXPRL
+   |EXPRL mayorigual EXPRL
+   |EXPRL menorigual EXPRL
    |EXP2
 ;
 
 EXP2
-   :EXP2 menor EXP2
-   |EXP2 mayor EXP2
-   |EXP3
-;
-
-EXP3
-   :EXP3 mayorigual EXP3
-   |EXP3 menorigual EXP3
-   |EXP4
-;
-
-EXP4
-   :EXP4 mas EXP4
-   |EXP4 menos EXP4
-   |EXP4 por EXP4
-   |EXP4 dividido EXP4
-   |EXP4 modulo EXP4
-   |EXP4 elevado EXP4
+   :EXP2 mas EXP2
+   |EXP2 menos EXP2
+   |EXP2 por EXP2
+   |EXP2 dividido EXP2
+   |EXP2 modulo EXP2
+   |EXP2 elevado EXP2
    |EXPVAL
 ;
 
 EXPVAL
-   :num
-   |menos num
+   :menos EXPVAL
+   |NUM                    {$$ = new Value($1.value, $1.type, Type.VALOR, this._$.first_line, this._$.first_column);}
    |parena EXPRL parenc
-   |cadena
-   |caracter
-   |vtrue
-   |vfalse
-   |id
+   |cadena                 {$$ = new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column);}
+   |caracter               {$$ = new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column);}
+   |vtrue                  {$$ = new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
+   |vfalse                 {$$ = new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
+   |id {console.log($1);}
    |ACCESOVECTOR
    |ACCESOLISTA
    |NATIVA
    |LLAMADA
+;
+
+NUM
+   :entero  {$$ = new Value(parseInt($1), Type.INT, Type.VALOR, this._$.first_line, this._$.first_column);}
+   |decimal {$$ =new Value(parseFloat($1), Type.DOUBLE, Type.VALOR, this._$.first_line, this._$.first_column);}
 ;
 

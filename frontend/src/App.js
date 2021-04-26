@@ -12,10 +12,11 @@ function App() {
   const [consola, setConsola] = useState('')
   const [file, setFile] = useState(null)
   var compilar = ()=>{
-    console.log('HELP')
+    var data = ''
     async function enviar(){
         let res = await axios.post("http://localhost:3000/compilar", {codigo: currentText});
-        console.log(res)    
+        data = res.data
+        setConsola(data)   
     }
     enviar()
   }
