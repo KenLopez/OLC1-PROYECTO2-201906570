@@ -3,6 +3,7 @@
    const Type = require('../clases/Type.js')
    const Global = require('../clases/Global.js')
    const Print = require('../clases/Print.js')
+   const Aritmetica = require('../clases/Aritmetica.js')
    var program = new Global()
 %}
 
@@ -86,8 +87,8 @@
 ([0-9])+(["."])([0-9])+                         return 'decimal';
 ([0-9])+                                        return 'entero';  
 ([a-zA-Z_])([a-zA-Z0-9_])*                      return 'id';
-["\""]([^"\""])*["\""]                          return'cadena';
-["\'"]([^"\'"])*["\'"]                          return'caracter';
+["\""]([^"\""])*["\""]                          {yytext = yytext.substring(1,yytext.length-1); return'cadena';}
+[\']([^']|"\\n"|"\\r"|"\\t")[\']                {yytext = yytext.substring(1,yytext.length-1); return'caracter';}
 
 <<EOF>>                                         return 'EOF';
 
@@ -166,6 +167,8 @@ INSTRUCCION
    |OPTERNARIO SYNC
    |LLAMADA SYNC
 ;
+
+
 
 BLOQUE
    :llavea BLOQUE2
@@ -336,12 +339,12 @@ EXPRL
 ;
 
 EXP2
-   :EXP2 mas EXP2
-   |EXP2 menos EXP2
-   |EXP2 por EXP2
-   |EXP2 dividido EXP2
-   |EXP2 modulo EXP2
-   |EXP2 elevado EXP2
+   :EXP2 mas EXP2          {$$ = new Aritmetica($1, $3, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXP2 menos EXP2        {$$ = new Aritmetica($1, $3, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXP2 por EXP2          {$$ = new Aritmetica($1, $3, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXP2 dividido EXP2     {$$ = new Aritmetica($1, $3, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXP2 modulo EXP2       {$$ = new Aritmetica($1, $3, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXP2 elevado EXP2      {$$ = new Aritmetica($1, $3, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
    |EXPVAL
 ;
 

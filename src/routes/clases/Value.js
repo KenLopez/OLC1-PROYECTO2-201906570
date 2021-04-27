@@ -7,6 +7,12 @@ class Value{
         this.fila = _fila
         this.typeExp = _typeExp
         this.columna = _columna
+        if ((this.type == Type.STRING) || (this.type == Type.CHAR)) {
+            this.value = this.value.replace(/\\n/g, '\n')
+            this.value = this.value.replace(/\\r/g, '\r')
+            this.value = this.value.replace(/\\t/g, '\t')
+            //this.value = this.value.substring(1,this.value.length-1)
+        }
     }
 
 

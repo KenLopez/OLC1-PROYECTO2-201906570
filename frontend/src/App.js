@@ -125,7 +125,12 @@ function App() {
                     )}
                   </Menu>
                   <Form>
-                    <TextArea value={currentText} style={{minHeight:500, maxHeight:500}} onChange={updateText}/>
+                    <TextArea 
+                      value={currentText} 
+                      style={{minHeight:500, maxHeight:500, fontFamily:"consolas"}} 
+                      onChange={updateText}
+                      spellCheck={false}
+                    />
                   </Form>
                 </Grid.Column>
                 <Grid.Column>
@@ -136,7 +141,11 @@ function App() {
                     </Header>
                   </Segment>
                   <Form>
-                    <TextArea disabled value={consola} style={{minHeight:555, maxHeight:555}}/>
+                    <TextArea 
+                      disabled value={consola} 
+                      style={{minHeight:555, maxHeight:555, fontFamily:"consolas"}}
+                      spellCheck = {false}
+                    />
                   </Form>
                 </Grid.Column>
               </Grid.Row>
