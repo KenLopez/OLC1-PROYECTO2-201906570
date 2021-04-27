@@ -4,6 +4,8 @@
    const Global = require('../clases/Global.js')
    const Print = require('../clases/Print.js')
    const Aritmetica = require('../clases/Aritmetica.js')
+   const Unitaria = require('../clases/Unitaria.js')
+   const Logica = require('../clases/Logica.js')
    var program = new Global()
 %}
 
@@ -110,6 +112,7 @@
 %left mas, menos
 %left por, dividido, modulo
 %right elevado
+%left interrog
 %left parena, parenc, llavea, llavec, corchetea, corchetec
 
 
@@ -122,7 +125,12 @@ INICIO
       p.ejecutar()
       return p;
    }
-   |EOF
+   |EOF{
+      var p = program
+      program = new Global()
+      p.ejecutar()
+      return p;
+   }
 ;
 
 
@@ -145,7 +153,7 @@ GLOBAL
    |OPTERNARIO SYNC
    |LLAMADA SYNC
    |MAIN SYNC
-   |error SYNC
+   |error
 ;
 
 /*BLOQUE LOCAL*/
@@ -164,7 +172,6 @@ INSTRUCCION
    |DOWHILE
    |FOR
    |PRINT SYNC
-   |OPTERNARIO SYNC
    |LLAMADA SYNC
 ;
 
@@ -326,32 +333,33 @@ DEFAULT
 
 /*EXPRESIONES Y VALORES*/
 EXPRL
-   :EXPRL ologico EXPRL
-   |EXPRL ylogico EXPRL
-   |exclamacion EXPRL
-   |EXPRL equals EXPRL
-   |EXPRL diferente EXPRL
-   |EXPRL menor EXPRL
-   |EXPRL mayor EXPRL
-   |EXPRL mayorigual EXPRL
-   |EXPRL menorigual EXPRL
+   :OPTERNARIO
+   |EXPRL ologico EXPRL       {$$ = new Logica($1, $3, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |EXPRL ylogico EXPRL       {$$ = new Logica($1, $3, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |exclamacion EXPRL         {$$ = new Unitaria($2, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column);}
+   |EXPRL equals EXPRL        {$$ = new Logica($1, $3, Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |EXPRL diferente EXPRL     {$$ = new Logica($1, $3, Type.DIFERENTE, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |EXPRL menor EXPRL         {$$ = new Logica($1, $3, Type.MENOR, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |EXPRL mayor EXPRL         {$$ = new Logica($1, $3, Type.MAYOR, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |EXPRL mayorigual EXPRL    {$$ = new Logica($1, $3, Type.MAYORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   |EXPRL menorigual EXPRL    {$$ = new Logica($1, $3, Type.MENORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
    |EXP2
 ;
 
 EXP2
-   :EXP2 mas EXP2          {$$ = new Aritmetica($1, $3, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXP2 menos EXP2        {$$ = new Aritmetica($1, $3, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXP2 por EXP2          {$$ = new Aritmetica($1, $3, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXP2 dividido EXP2     {$$ = new Aritmetica($1, $3, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXP2 modulo EXP2       {$$ = new Aritmetica($1, $3, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXP2 elevado EXP2      {$$ = new Aritmetica($1, $3, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   :EXPRL mas EXPRL          {$$ = new Aritmetica($1, $3, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL menos EXPRL        {$$ = new Aritmetica($1, $3, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL por EXRL          {$$ = new Aritmetica($1, $3, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL dividido EXRL     {$$ = new Aritmetica($1, $3, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL modulo EXPRL       {$$ = new Aritmetica($1, $3, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL elevado EXPRL      {$$ = new Aritmetica($1, $3, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
    |EXPVAL
 ;
 
 EXPVAL
-   :menos EXPVAL
+   :menos EXPRL           {$$ = new Unitaria($2, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column);}
+   |parena EXPRL parenc    {$$ = $2}
    |NUM                    {$$ = new Value($1.value, $1.type, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |parena EXPRL parenc
    |cadena                 {$$ = new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column);}
    |caracter               {$$ = new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column);}
    |vtrue                  {$$ = new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}

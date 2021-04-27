@@ -21,7 +21,10 @@ const Type = {
     RELACIONAL:         'RELACIONAL',
     MAYOR:              'MAYOR',
     MENOR:              'MENOR',
+    MAYORIGUAL:         'MAYORIGUAL',
+    MENORIGUAL:         'MENORIGUAL',
     IGUAL:              'IGUAL',
+    DIFERENTE:          'DIFERENTE',
     NEGACION:           'NEGACION',
     CASTEO:             'CASTEO',
     NATIVA:             'NATIVA',
@@ -30,10 +33,13 @@ const Type = {
     PRINT:              'PRINT',
     SUMA:               'SUMA',
     RESTA:              'RESTA',
-    MULTIPLICACION:     'MULTIPLIACION',
+    MULTIPLICACION:     'MULTIPLICACION',
     DIVISION:           'DIVISION',
     POTENCIA:           'POTENCIA',
     MODULO:             'MODULO',
-
+    UNITARIA:           'UNITARIA',
+    NOT:                'NOT',
+    AND:                'AND',
+    OR:                 'OR',
 }
 module.exports = Type;

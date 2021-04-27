@@ -1,5 +1,4 @@
 const Type = require('./Type.js')
-const Global = require('./Global.js')
 class Value{
     constructor(_value, _type, _typeExp, _fila, _columna){
         this.value = _value
@@ -26,9 +25,9 @@ class Value{
             case Type.BOOLEAN:
                 return new Value(this.value, this.type, this.typeExp, this.fila, this.columna)
             case Type.STRING:
-                return new Value(this.value.substring(1,this.value.length-1), this.type, this.typeExp, this.fila, this.columna)
+                return new Value(this.value, this.type, this.typeExp, this.fila, this.columna)
             case Type.CHAR:
-                return new Value(this.value.substring(1,this.value.length-1), this.type, this.typeExp, this.fila, this.columna)
+                return new Value(this.value, this.type, this.typeExp, this.fila, this.columna)
             default:
                 break;
         }

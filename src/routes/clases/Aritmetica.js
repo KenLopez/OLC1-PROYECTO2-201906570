@@ -1,8 +1,7 @@
 const Type = require('./Type.js')
-const Global = require('./Global.js')
 const Value = require('./Value.js')
 class Aritmetica{
-    constructor(_expDer, _expIzq, _type,_typeExp, _fila, _columna){
+    constructor(_expIzq, _expDer, _type,_typeExp, _fila, _columna){
         this.expDer = _expDer
         this.expIzq = _expIzq
         this.type = _typeExp
@@ -15,48 +14,47 @@ class Aritmetica{
     ejecutar(tabla, global){
         let der = this.expDer.ejecutar(tabla, global)
         let izq = this.expIzq.ejecutar(tabla, global)
-        if (der.type == Type.INT) {
-            if (izq.type == Type.INT) {
+        if (izq.type == Type.INT) {
+            if (der.type == Type.INT) {
                 switch (this.type) {
                     case Type.SUMA:
-                        console.log(new Value(2,Type.INT,Type.VALOR,3, 6))
-                        return new Value(der.value + izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
-                        return new Value(der.value * izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value * der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.DIVISION:
-                        return new Value(der.value / izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value / der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MODULO:
-                        return new Value(der.value % izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value % der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.POTENCIA:
-                        return new Value(der.value ^ izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(Math.pow(izq.value,der.value),Type.INT,Type.VALOR,this.fila, this.columna)
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.DOUBLE) {
+            }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
-                        return new Value(der.value * izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value * der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.DIVISION:
-                        return new Value(der.value / izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value / der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MODULO:
-                        return new Value(der.value % izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value % der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.POTENCIA:
-                        return new Value(der.value ^ izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(Math.pow(izq.value,der.value),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.BOOLEAN) {
+            }else if (der.type == Type.BOOLEAN) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + (izq.value?1:0),Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + (der.value?1:0),Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - (izq.value?1:0),Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - (der.value?1:0),Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
                         return null
                     case Type.DIVISION:
@@ -68,16 +66,16 @@ class Aritmetica{
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.CHAR) {
+            }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value.charCodeAt(0),Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value.charCodeAt(0),Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - izq.value.charCodeAt(0),Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - der.value.charCodeAt(0),Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
-                        return new Value(der.value * izq.value.charCodeAt(0),Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value * der.value.charCodeAt(0),Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.DIVISION:
-                        return new Value(der.value / izq.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value / der.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MODULO:
                         return null
                     case Type.POTENCIA:
@@ -85,10 +83,10 @@ class Aritmetica{
                     default:
                         return null
                 }
-            }else if (izq.type == Type.STRING) {
+            }else if (der.type == Type.STRING) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(String(der.value) + izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value(String(izq.value) + der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -103,68 +101,51 @@ class Aritmetica{
                         return null
                 } 
             }
-        }else if (der.type == Type.DOUBLE) {
-            if (izq.type == Type.INT) {
+        }else if (izq.type == Type.DOUBLE) {
+            if (der.type == Type.INT) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
-                        return new Value(der.value * izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value * der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.DIVISION:
-                        return new Value(der.value / izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value / der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MODULO:
-                        return new Value(der.value % izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value % der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.POTENCIA:
-                        return new Value(der.value ^ izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(Math.pow(izq.value,der.value),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.DOUBLE) {
+            }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
-                        return new Value(der.value * izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value * der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.DIVISION:
-                        return new Value(der.value / izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value / der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MODULO:
-                        return new Value(der.value % izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value % der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.POTENCIA:
-                        return new Value(der.value ^ izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(Math.pow(izq.value,der.value),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.BOOLEAN) {
+            }else if (der.type == Type.BOOLEAN) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + (izq.value?1:0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + (der.value?1:0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value(der.value - (izq.value?1:0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value - (der.value?1:0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
                         return null
                     case Type.DIVISION:
                         return null
-                    case Type.MODULO:
-                        return null
-                    case Type.POTENCIA:
-                        return null
-                    default:
-                        return null
-                } 
-            }else if (izq.type == Type.CHAR) {
-                switch (this.type) {
-                    case Type.SUMA:
-                        return new Value(der.value + izq.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.RESTA:
-                        return new Value(der.value - izq.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.MULTIPLICACION:
-                        return new Value(der.value * izq.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.DIVISION:
-                        return new Value(der.value / izq.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MODULO:
                         return null
                     case Type.POTENCIA:
@@ -172,10 +153,27 @@ class Aritmetica{
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.STRING) {
+            }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(String(der.value) + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.RESTA:
+                        return new Value(izq.value - der.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.MULTIPLICACION:
+                        return new Value(izq.value * der.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.DIVISION:
+                        return new Value(izq.value / der.value.charCodeAt(0),Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.MODULO:
+                        return null
+                    case Type.POTENCIA:
+                        return null
+                    default:
+                        return null
+                } 
+            }else if (der.type == Type.STRING) {
+                switch (this.type) {
+                    case Type.SUMA:
+                        return new Value(String(izq.value) + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -190,13 +188,13 @@ class Aritmetica{
                         return null
                 }
             }
-        }else if (der.type == Type.BOOLEAN) {
-            if (izq.type == Type.INT) {
+        }else if (izq.type == Type.BOOLEAN) {
+            if (der.type == Type.INT) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value((der.value?1:0) + izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value((izq.value?1:0) + der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value((der.value?1:0) - izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                        return new Value((izq.value?1:0) - der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
                         return null
                     case Type.DIVISION:
@@ -208,12 +206,12 @@ class Aritmetica{
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.DOUBLE) {
+            }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value((der.value?1:0) + izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value((izq.value?1:0) + der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
-                        return new Value((der.value?1:0) + izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                        return new Value((izq.value?1:0) + der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
                     case Type.MULTIPLICACION:
                         return null
                     case Type.DIVISION:
@@ -225,24 +223,7 @@ class Aritmetica{
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.BOOLEAN) {
-                switch (this.type) {
-                    case Type.SUMA:
-                        return null
-                    case Type.RESTA:
-                        return null
-                    case Type.MULTIPLICACION:
-                        return null
-                    case Type.DIVISION:
-                        return null
-                    case Type.MODULO:
-                        return null
-                    case Type.POTENCIA:
-                        return null
-                    default:
-                        return null
-                } 
-            }else if (izq.type == Type.CHAR) {
+            }else if (der.type == Type.BOOLEAN) {
                 switch (this.type) {
                     case Type.SUMA:
                         return null
@@ -259,60 +240,7 @@ class Aritmetica{
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.STRING) {
-                switch (this.type) {
-                    case Type.SUMA:
-                        return new Value(String(der.value) + izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
-                    case Type.RESTA:
-                        return null
-                    case Type.MULTIPLICACION:
-                        return null
-                    case Type.DIVISION:
-                        return null
-                    case Type.MODULO:
-                        return null
-                    case Type.POTENCIA:
-                        return null
-                    default:
-                        return null
-                } 
-            }
-        }else if (der.type == Type.CHAR) {
-            if (izq.type == Type.INT) {
-                switch (this.type) {
-                    case Type.SUMA:
-                        return new Value(der.value.charCodeAt(0) + izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
-                    case Type.RESTA:
-                        return new Value(der.value.charCodeAt(0) - izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
-                    case Type.MULTIPLICACION:
-                        return new Value(der.value.charCodeAt(0) * izq.value,Type.INT,Type.VALOR,this.fila, this.columna)
-                    case Type.DIVISION:
-                        return new Value(der.value.charCodeAt(0) / izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.MODULO:
-                        return null
-                    case Type.POTENCIA:
-                        return null
-                    default:
-                        return null
-                } 
-            }else if (izq.type == Type.DOUBLE) {
-                switch (this.type) {
-                    case Type.SUMA:
-                        return new Value(der.value.charCodeAt(0) + izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.RESTA:
-                        return new Value(der.value.charCodeAt(0) - izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.MULTIPLICACION:
-                        return new Value(der.value.charCodeAt(0) * izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.DIVISION:
-                        return new Value(der.value.charCodeAt(0) / izq.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
-                    case Type.MODULO:
-                        return null
-                    case Type.POTENCIA:
-                        return null
-                    default:
-                        return null
-                } 
-            }else if (izq.type == Type.BOOLEAN) {
+            }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.SUMA:
                         return null
@@ -329,27 +257,10 @@ class Aritmetica{
                     default:
                         return null
                 } 
-            }else if (izq.type == Type.CHAR) {
+            }else if (der.type == Type.STRING) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
-                    case Type.RESTA:
-                        return null
-                    case Type.MULTIPLICACION:
-                        return null
-                    case Type.DIVISION:
-                        return null
-                    case Type.MODULO:
-                        return null
-                    case Type.POTENCIA:
-                        return null
-                    default:
-                        return null
-                } 
-            }else if (izq.type == Type.STRING) {
-                switch (this.type) {
-                    case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(String(izq.value) + der.value,Type.INT,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -364,11 +275,98 @@ class Aritmetica{
                         return null
                 } 
             }
-        }else if (der.type == Type.STRING) {
-            if (izq.type == Type.INT) {
+        }else if (izq.type == Type.CHAR) {
+            if (der.type == Type.INT) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value.charCodeAt(0) + der.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                    case Type.RESTA:
+                        return new Value(izq.value.charCodeAt(0) - der.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                    case Type.MULTIPLICACION:
+                        return new Value(izq.value.charCodeAt(0) * der.value,Type.INT,Type.VALOR,this.fila, this.columna)
+                    case Type.DIVISION:
+                        return new Value(izq.value.charCodeAt(0) / der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.MODULO:
+                        return null
+                    case Type.POTENCIA:
+                        return null
+                    default:
+                        return null
+                } 
+            }else if (der.type == Type.DOUBLE) {
+                switch (this.type) {
+                    case Type.SUMA:
+                        return new Value(izq.value.charCodeAt(0) + der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.RESTA:
+                        return new Value(izq.value.charCodeAt(0) - der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.MULTIPLICACION:
+                        return new Value(izq.value.charCodeAt(0) * der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.DIVISION:
+                        return new Value(izq.value.charCodeAt(0) / der.value,Type.DOUBLE,Type.VALOR,this.fila, this.columna)
+                    case Type.MODULO:
+                        return null
+                    case Type.POTENCIA:
+                        return null
+                    default:
+                        return null
+                } 
+            }else if (der.type == Type.BOOLEAN) {
+                switch (this.type) {
+                    case Type.SUMA:
+                        return null
+                    case Type.RESTA:
+                        return null
+                    case Type.MULTIPLICACION:
+                        return null
+                    case Type.DIVISION:
+                        return null
+                    case Type.MODULO:
+                        return null
+                    case Type.POTENCIA:
+                        return null
+                    default:
+                        return null
+                } 
+            }else if (der.type == Type.CHAR) {
+                switch (this.type) {
+                    case Type.SUMA:
+                        return new Value(izq.value + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                    case Type.RESTA:
+                        return null
+                    case Type.MULTIPLICACION:
+                        return null
+                    case Type.DIVISION:
+                        return null
+                    case Type.MODULO:
+                        return null
+                    case Type.POTENCIA:
+                        return null
+                    default:
+                        return null
+                } 
+            }else if (der.type == Type.STRING) {
+                switch (this.type) {
+                    case Type.SUMA:
+                        return new Value(izq.value + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                    case Type.RESTA:
+                        return null
+                    case Type.MULTIPLICACION:
+                        return null
+                    case Type.DIVISION:
+                        return null
+                    case Type.MODULO:
+                        return null
+                    case Type.POTENCIA:
+                        return null
+                    default:
+                        return null
+                } 
+            }
+        }else if (izq.type == Type.STRING) {
+            if (der.type == Type.INT) {
+                switch (this.type) {
+                    case Type.SUMA:
+                        return new Value(izq.value + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -382,10 +380,10 @@ class Aritmetica{
                     default:
                         return null
                 }  
-            }else if (izq.type == Type.DOUBLE) {
+            }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -399,10 +397,10 @@ class Aritmetica{
                     default:
                         return null
                 }  
-            }else if (izq.type == Type.BOOLEAN) {
+            }else if (der.type == Type.BOOLEAN) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + String(izq.value),Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + String(der.value),Type.STRING,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -416,10 +414,10 @@ class Aritmetica{
                     default:
                         return null
                 }  
-            }else if (izq.type == Type.CHAR) {
+            }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:
@@ -433,10 +431,10 @@ class Aritmetica{
                     default:
                         return null
                 }  
-            }else if (izq.type == Type.STRING) {
+            }else if (der.type == Type.STRING) {
                 switch (this.type) {
                     case Type.SUMA:
-                        return new Value(der.value + izq.value,Type.STRING,Type.VALOR,this.fila, this.columna)
+                        return new Value(izq.value + der.value,Type.STRING,Type.VALOR,this.fila, this.columna)
                     case Type.RESTA:
                         return null
                     case Type.MULTIPLICACION:

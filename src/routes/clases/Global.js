@@ -1,7 +1,4 @@
-const Value = require('./Value.js')
 const Type = require('./Type.js')
-const Print = require('./Print.js')
-const Aritmetica = require('./Aritmetica.js')
 class Global{
     constructor(){
         this.instrucciones = []
