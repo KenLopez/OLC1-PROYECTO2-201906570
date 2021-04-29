@@ -9,12 +9,8 @@ class Print{
     }
 
     ejecutar(tabla, global){
-        if (this.value != null) {
-            var v = this.value.ejecutar(tabla, global)
-            global.newPrint(String(v.value)+'\n')
-        }else{
-            global.newPrint('\n')
-        }
+        var v = this.value.ejecutar(tabla, global)
+        global.newPrint(v)
         return null
     }
 }

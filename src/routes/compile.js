@@ -7,9 +7,9 @@ router.post('/compilar', function(req, res, next){
   try {
     var program = parser.parse(req.body.codigo)
     res.statusCode = 200
-    res.send(program.getOutput())
+    res.send({data: program.getOutput()})
   } catch (error) {
-    res.send("No compiló D:")
+    res.send({data:"No compiló D:"})
   }
 })
 module.exports = router;

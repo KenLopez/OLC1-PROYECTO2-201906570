@@ -6,6 +6,9 @@
    const Aritmetica = require('../clases/Aritmetica.js')
    const Unitaria = require('../clases/Unitaria.js')
    const Logica = require('../clases/Logica.js')
+   const Declaracion = require('../clases/Declaracion.js')
+   const Symbol = require('../clases/Symbol.js')
+   const Asignacion = require('../clases/Asignacion.js')
    var program = new Global()
 %}
 
@@ -141,15 +144,15 @@ GLOBALES
 ;
 
 GLOBAL
-   :DECLARACION SYNC
-   |ASIGNACION SYNC
+   :DECLARACION SYNC    {program.instrucciones.push($1)}
+   |ASIGNACION SYNC     {program.instrucciones.push($1)}
    |FUNCION
    |IF
    |SWITCH
    |WHILE
    |DOWHILE
    |FOR
-   |PRINT SYNC {program.instrucciones.push($1)}
+   |PRINT SYNC          {program.instrucciones.push($1)}
    |OPTERNARIO SYNC
    |LLAMADA SYNC
    |MAIN SYNC
@@ -205,33 +208,33 @@ NATIVA
 
 /*VARIABLES*/
 DECLARACION
-   :TYPE id
-   |TYPE id igual EXPRL
-   |TYPE id igual CASTEO EXPRL
+   :TYPE id                                                                   {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
+   |TYPE id igual EXPRL                                                       {$$ = new Declaracion($2, $4, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
+   |TYPE id igual CASTEO 
    |TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
    |TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
    |tlista TYPE id igual nuevo tlista menor TYPE mayor       
 ;
 
 CASTEO
-   :parena TYPE parenc
+   :parena TYPE parenc EXPRL
 ;
 
 ASIGNACION
-   :id igual EXPRL
-   |id igual CASTEO EXPRL
-   |id incremento 
-   |id decremento 
+   :id igual EXPRL            {$$ = new Asignacion($1, $3, Type.ASIGNACION, this._$.first_line, this._$.first_column)}          
+   |id igual CASTEO
+   |id incremento             {$$ = new Asignacion($1, null, Type.INCREMENTO, this._$.first_line, this._$.first_column)}
+   |id decremento             {$$ = new Asignacion($1, null, Type.DECREMENTO, this._$.first_line, this._$.first_column)} 
    |ACCESOVECTOR igual EXPRL 
    |ACCESOLISTA igual EXPRL 
 ;
 
 TYPE
-   :tint 
-   |tstring 
-   |tdouble 
-   |tboolean
-   |tchar 
+   :tint          {$$ = Type.INT;}
+   |tstring       {$$ = Type.STRING;}
+   |tdouble       {$$ = Type.DOUBLE;}
+   |tbool         {$$ = Type.BOOLEAN;}
+   |tchar         {$$ = Type.CHAR;}
 ;
 
 ACCESOVECTOR
@@ -343,28 +346,28 @@ EXPRL
    |EXPRL mayor EXPRL         {$$ = new Logica($1, $3, Type.MAYOR, Type.LOGICO, this._$.first_line, this._$.first_column);}
    |EXPRL mayorigual EXPRL    {$$ = new Logica($1, $3, Type.MAYORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
    |EXPRL menorigual EXPRL    {$$ = new Logica($1, $3, Type.MENORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXP2
+   |EXP2                      {$$ = $1}
 ;
 
 EXP2
-   :EXPRL mas EXPRL          {$$ = new Aritmetica($1, $3, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL menos EXPRL        {$$ = new Aritmetica($1, $3, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL por EXRL          {$$ = new Aritmetica($1, $3, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL dividido EXRL     {$$ = new Aritmetica($1, $3, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL modulo EXPRL       {$$ = new Aritmetica($1, $3, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL elevado EXPRL      {$$ = new Aritmetica($1, $3, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPVAL
+   :EXPRL mas EXPRL           {$$ = new Aritmetica($1, $3, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL menos EXPRL         {$$ = new Aritmetica($1, $3, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL por EXPRL           {$$ = new Aritmetica($1, $3, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL dividido EXPRL      {$$ = new Aritmetica($1, $3, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL modulo EXPRL        {$$ = new Aritmetica($1, $3, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPRL elevado EXPRL       {$$ = new Aritmetica($1, $3, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
+   |EXPVAL                    {$$ = $1}
 ;
 
 EXPVAL
-   :menos EXPRL           {$$ = new Unitaria($2, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column);}
+   :menos EXPRL            {$$ = new Unitaria($2, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column);}
    |parena EXPRL parenc    {$$ = $2}
    |NUM                    {$$ = new Value($1.value, $1.type, Type.VALOR, this._$.first_line, this._$.first_column);}
    |cadena                 {$$ = new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column);}
    |caracter               {$$ = new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column);}
    |vtrue                  {$$ = new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
    |vfalse                 {$$ = new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |id {console.log($1);}
+   |id                     {$$ = new Symbol($1, null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column );}
    |ACCESOVECTOR
    |ACCESOLISTA
    |NATIVA

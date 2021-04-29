@@ -15,8 +15,8 @@ function App() {
     var data = ''
     async function enviar(){
         let res = await axios.post("http://localhost:3000/compilar", {codigo: currentText});
-        data = res.data
-        setConsola(data)   
+        data = String(res.data.data)
+        setConsola(String(data))   
     }
     enviar()
   }

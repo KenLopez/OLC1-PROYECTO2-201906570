@@ -17,6 +17,7 @@ class Value{
 
 
     ejecutar(tabla, global) {
+        return new Value(this.value, this.type, this.typeExp, this.fila, this.columna)
         switch (this.type) {
             case Type.INT:
                 return new Value(this.value, this.type, this.typeExp, this.fila, this.columna)
@@ -31,7 +32,7 @@ class Value{
             default:
                 break;
         }
-        return new Value(this.value, this.type, this.typeExp, this.fila, this.columna)    
+        return null 
     }
 }
 module.exports = Value
