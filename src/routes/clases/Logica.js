@@ -14,6 +14,10 @@ class Logica{
     ejecutar(tabla, global){
         let izq = this.expIzq.ejecutar(tabla,global)
         let der = this.expDer.ejecutar(tabla,global)
+        if (der == null || izq == null) {
+            global.newError(Type.SEMANTICO, 'No se pudo operar, null pointer exception.', this.fila, this.columna )
+            return null
+        }  
         if (izq.type == Type.INT) {
             if (der.type == Type.INT) {
                 switch (this.type) {
@@ -29,12 +33,6 @@ class Logica{
                         return new Value(izq.value <= der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
@@ -50,15 +48,8 @@ class Logica{
                         return new Value(izq.value <= der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 } 
             }else if (der.type == Type.BOOLEAN) {
-                return null 
             }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.IGUAL: 
@@ -73,15 +64,8 @@ class Logica{
                         return new Value(izq.value <= der.value.charCodeAt(0), Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value != der.value.charCodeAt(0), Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.STRING) {
-                return null
             }
         }else if (izq.type == Type.DOUBLE) {
             if (der.type == Type.INT) {
@@ -98,12 +82,6 @@ class Logica{
                         return new Value(izq.value <= der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
@@ -119,15 +97,8 @@ class Logica{
                         return new Value(izq.value <= der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 } 
             }else if (der.type == Type.BOOLEAN) {
-                return null 
             }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.IGUAL: 
@@ -142,21 +113,12 @@ class Logica{
                         return new Value(izq.value <= der.value.charCodeAt(0), Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value != der.value.charCodeAt(0), Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.STRING) {
-                return null
             }
         }else if (izq.type == Type.BOOLEAN) {
             if (der.type == Type.INT) {
-                return null
             }else if (der.type == Type.DOUBLE) {
-                return null
             }else if (der.type == Type.BOOLEAN) {
                 switch (this.type) {
                     case Type.IGUAL: 
@@ -175,13 +137,9 @@ class Logica{
                         return new Value(izq.value && der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.OR: 
                         return new Value(izq.value || der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    default:
-                        return null
                 } 
             }else if (der.type == Type.CHAR) {
-                return null
             }else if (der.type == Type.STRING) {
-                return null
             }
         }else if (izq.type == Type.CHAR) {
             if (der.type == Type.INT) {
@@ -198,12 +156,6 @@ class Logica{
                         return new Value(izq.value.charCodeAt(0) <= der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value.charCodeAt(0) != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.DOUBLE) {
                 switch (this.type) {
@@ -219,15 +171,8 @@ class Logica{
                         return new Value(izq.value.charCodeAt(0) <= der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value.charCodeAt(0) != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.BOOLEAN) {
-                return null 
             }else if (der.type == Type.CHAR) {
                 switch (this.type) {
                     case Type.IGUAL: 
@@ -242,48 +187,32 @@ class Logica{
                         return new Value(izq.value.charCodeAt(0) <= der.value.charCodeAt(0), Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.DIFERENTE: 
                         return new Value(izq.value.charCodeAt(0) != der.value.charCodeAt(0), Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
-                    case Type.AND: 
-                        return null
-                    case Type.OR: 
-                        return null
-                    default:
-                        return null
                 }
             }else if (der.type == Type.STRING) {
-                return null
             }
         }else if (izq.type == Type.STRING) {
             if (der.type == Type.INT) {
-                return null
             }else if (der.type == Type.DOUBLE) {
-                return null 
             }else if (der.type == Type.BOOLEAN) {
-                return null 
             }else if (der.type == Type.CHAR) {
-                return null 
             }else if (der.type == Type.STRING) {
                 switch (this.type) {
                     case Type.IGUAL: 
                         return new Value(izq.value == der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.MAYOR: 
-                        return null
                     case Type.MENOR: 
-                        return null
                     case Type.MAYORIGUAL: 
-                        return null
                     case Type.MENORIGUAL: 
-                        return null
                     case Type.DIFERENTE: 
                         return new Value(izq.value.charCodeAt(0) != der.value, Type.BOOLEAN, Type.VALOR, this.fila, this.columna)
                     case Type.AND: 
-                        return null
                     case Type.OR: 
-                        return null
-                    default:
-                        return null
                 } 
             }
         }
+        global.newError(Type.SEMANTICO, 'No se pudo operar: '+izq.type+' '+this.type+' '+der.type +
+        '; tipos incompatibles.', this.fila, this.columna )
+        return null
     }
 }
 

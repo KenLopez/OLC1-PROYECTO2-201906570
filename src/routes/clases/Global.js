@@ -10,6 +10,15 @@ class Global{
         this.output = ''
     }
 
+    newError(_type, _mensaje, _fila, _columna){
+        this.errores.push({
+            type: _type,
+            mensaje: _mensaje,
+            fila: _fila,
+            columna: _columna
+        })
+    }
+
     newPrint(string){
         this.output += String(string.value) + '\n'
     }
@@ -18,10 +27,18 @@ class Global{
         return String(this.output)
     }
 
+    getErrors(){
+        return this.errores
+    }
+
     ejecutar(){
-        this.instrucciones.forEach(instruccion => {
-            instruccion.ejecutar(this.symbolTable, this)
-        });
+        for (let index = 0; index < this.instrucciones.length; index++) {
+            const instruccion = this.instrucciones[index]
+            let res = instruccion.ejecutar(this.symbolTable, this)
+            if (res == Type.ERROR) {
+                this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+instruccion.type,instruccion.fila, instruccion.columna)
+            }
+        }
     }
 
 

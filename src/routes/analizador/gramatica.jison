@@ -97,7 +97,8 @@
 
 <<EOF>>                                         return 'EOF';
 
-.                                               {console.log('Error léxico: '+yytext+', en la línea: '+yylloc.first_line+'; columna: '+yylloc.first_column);}
+.                                               {program.newError(Type.LEXICO, 'El símbolo: '+yytext+', no es parte'+
+                                                ' del alfabeto.', yylloc.first_line, yylloc.first_column)}
 
 /lex
 
@@ -141,6 +142,7 @@ INICIO
 GLOBALES
    :GLOBALES GLOBAL
    |GLOBAL
+   |error SYNC {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 GLOBAL
@@ -156,13 +158,13 @@ GLOBAL
    |OPTERNARIO SYNC
    |LLAMADA SYNC
    |MAIN SYNC
-   |error
 ;
 
 /*BLOQUE LOCAL*/
 INSTRUCCIONES
    :INSTRUCCIONES INSTRUCCION
    |INSTRUCCION
+   |error SYNC {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 INSTRUCCION
@@ -208,12 +210,12 @@ NATIVA
 
 /*VARIABLES*/
 DECLARACION
-   :TYPE id                                                                   {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
+   :TYPE id                                                              {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
    |TYPE id igual EXPRL                                                       {$$ = new Declaracion($2, $4, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
    |TYPE id igual CASTEO 
    |TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
    |TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
-   |tlista TYPE id igual nuevo tlista menor TYPE mayor       
+   |tlista TYPE id igual nuevo tlista menor TYPE mayor   
 ;
 
 CASTEO
@@ -248,6 +250,7 @@ ACCESOLISTA
 /*SIGNO DE SINCRONIZACIÓN*/
 SYNC
    :ptcoma
+   |error {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 

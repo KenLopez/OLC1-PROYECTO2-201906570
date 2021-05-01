@@ -22,7 +22,7 @@ class SymbolTable{
         return null
     }
 
-    increment(_id, _fila, _columna){
+    increment(_id, _fila, _columna, global){
         let s = this.find(_id)
         if (s != null) {
             switch (s.type) {
@@ -35,10 +35,12 @@ class SymbolTable{
                 default:
                     return null
             }
+        }else{
+            global.newError(Type.SEMANTICO, _id + ' no está definido.', _fila, _columna)
         }
     }
 
-    decrement(_id,_fila, _columna){
+    decrement(_id,_fila, _columna, global){
         let s = this.find(_id)
         if (s != null) {
             switch (s.type) {
@@ -51,10 +53,12 @@ class SymbolTable{
                 default:
                     return null
             }
+        }else{
+            global.newError(Type.SEMANTICO, _id + ' no está definido.', _fila, _columna)
         }
     }
 
-    updateSymbol(_id, _value){
+    updateSymbol(_id, _value,_fila,_columna, global){
         let s = this.find(_id);
         if (s != null){
             if (_value.type != s.type) {
@@ -83,7 +87,7 @@ class SymbolTable{
                             _value.value = Math.trunc(_value.value)
                         }
                     default:
-                        break;
+                        return null
                 }
             }
             if (_value.type == s.type) {
@@ -91,8 +95,9 @@ class SymbolTable{
                     _value.columna)
                 return true
             }
+        }else{
+            global.newError(Type.SEMANTICO, _id + ' no está definido.', _fila, _columna)
         }
-        return false
     }
 
     newSymbol(_id, _value, _type, _typeExp, _fila, _columna){

@@ -46,5 +46,9 @@ const Type = {
     METODO:             'METODO',
     INCREMENTO:         'INCREMENTO',
     DECREMENTO:         'DECREMENTO',
+    LEXICO:             'LÉXICO',
+    SINTACTICO:         'SINTÁCTICO',
+    SEMANTICO:          'SEMANTICO',
+    ERROR:              'ERROR',
 }
 module.exports = Type;

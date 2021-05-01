@@ -12,6 +12,10 @@ class Unitaria{
 
     ejecutar(tabla, global){
         let xp = this.exp.ejecutar(tabla,global)
+        if (xp == null) {
+            global.newError(Type.SEMANTICO, 'No se pudo operar, null pointer exception.', this.fila, this.columna )
+            return null
+        }
         switch (this.type) {
             case Type.NEGACION: 
                 switch (xp.type) {
@@ -20,13 +24,15 @@ class Unitaria{
                     case Type.DOUBLE:
                         return new Value(-1*xp.value,xp.type, xp.typeExp,this.fila,this.columna)
                     default:
-                        return nil;
+                        global.newError(Type.SEMANTICO, 'No se pudo operar, el tipo: '+xp.type+', no puede ser negado.', this.fila, this.columna )
+                        return null
                 }
             case Type.NOT:
                 switch (xp.type) {
                     case Type.BOOLEAN:
                         return new Value(!xp.value,xp.type, xp.typeExp,this.fila,this.columna)
                     default:
+                        global.newError(Type.SEMANTICO, 'No se pudo operar, el tipo: '+xp.type+', no puede ser negado.', this.fila, this.columna )
                         return null
                 }
             default:
