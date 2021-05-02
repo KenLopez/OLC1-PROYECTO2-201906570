@@ -22,6 +22,7 @@ function App() {
         let res = await axios.post("http://localhost:3000/compilar", {codigo: currentText});
         data = String(res.data.data)
         errores = res.data.errores
+        console.log(res.data.symbols)
         if (errores.length>0) {
           setTab(1);
         }

@@ -11,14 +11,15 @@ class For{
         this.columna = _columna
     }
 
-    ejecutar(table, global){
+    ejecutar(table, global, ambito){
+        let current = ambito+'_'+Type.FOR
         var newTable = new SymbolTable(table)
         if (this.symbol.typeExp == Type.ASIGNACION) {
             if (this.symbol.ejecutar(table,global)==Type.ERROR) {
                 return Type.ERROR
             }
         }else if (this.symbol.typeExp == Type.DECLARACION) {
-            if (this.symbol.ejecutar(newTable,global)==Type.ERROR) {
+            if (this.symbol.ejecutar(newTable,global, current)==Type.ERROR) {
                 return Type.ERROR
             }
         }
@@ -26,7 +27,13 @@ class For{
         if (v!=null){
             if (v.type == Type.BOOLEAN){
                 while (this.condicion.ejecutar(newTable, global).value) {
-                    this.bloque.ejecutar(newTable,global)
+                    let res = this.bloque.ejecutar(newTable,global, current)
+                    if (res == Type.ERROR) {
+                        this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+this.type,this.fila, this.columna)
+                        return Type.ERROR
+                    }else if (res == Type.BREAK) {
+                        break
+                    }
                     let tmp = new SymbolTable(table)
                     tmp.symbols.push(newTable.find(this.symbol.id))
                     newTable = tmp

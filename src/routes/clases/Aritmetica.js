@@ -14,7 +14,7 @@ class Aritmetica{
     ejecutar(tabla, global){
         let der = this.expDer.ejecutar(tabla, global)
         let izq = this.expIzq.ejecutar(tabla, global)
-        if (der == null || izq == null) {
+        if ((der == null) || (izq == null) || (der == Type.ERROR) || (izq == Type.ERROR)) {
             global.newError(Type.SEMANTICO, 'No se pudo operar, null pointer exception.', this.fila, this.columna )
             return null
         }   

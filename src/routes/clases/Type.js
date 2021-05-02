@@ -51,5 +51,10 @@ const Type = {
     SEMANTICO:          'SEMANTICO',
     ERROR:              'ERROR',
     BLOQUE:             'BLOQUE',
+    GLOBAL:             'GLOBAL',
+    BREAK:              'BREAK',
+    RETURN:             'RETURN',
+    CONTINUE:           'CONTINUE',
+    CONTROL:            'CONTROL',
 }
 module.exports = Type;

@@ -11,10 +11,10 @@ class Logica{
         this.columna = _columna
     }
 
-    ejecutar(tabla, global){
+    ejecutar(tabla, global, aux = true){
         let izq = this.expIzq.ejecutar(tabla,global)
         let der = this.expDer.ejecutar(tabla,global)
-        if (der == null || izq == null) {
+        if ((der == null) || (izq == null) || (der == Type.ERROR) || (izq == Type.ERROR)) {
             global.newError(Type.SEMANTICO, 'No se pudo operar, null pointer exception.', this.fila, this.columna )
             return null
         }  
@@ -210,8 +210,10 @@ class Logica{
                 } 
             }
         }
-        global.newError(Type.SEMANTICO, 'No se pudo operar: '+izq.type+' '+this.type+' '+der.type +
-        '; tipos incompatibles.', this.fila, this.columna )
+        if (aux) {
+            global.newError(Type.SEMANTICO, 'No se pudo operar: '+izq.type+' '+this.type+' '+der.type +
+            '; tipos incompatibles.', this.fila, this.columna )    
+        }
         return null
     }
 }

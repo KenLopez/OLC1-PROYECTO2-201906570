@@ -14,6 +14,7 @@ class Print{
             global.newPrint(v)   
         }else{
             global.newError(Type.SEMANTICO, "No se pudo ejecutar, null pointer exception.", this.fila, this.columna)
+            return Type.ERROR
         }
         return null
     }

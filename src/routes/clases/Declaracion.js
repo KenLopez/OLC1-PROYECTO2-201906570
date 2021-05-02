@@ -32,7 +32,7 @@ class Declaracion{
         }
     }
 
-    ejecutar(tabla, global){
+    ejecutar(tabla, global, ambito){
         switch (this.value.typeExp) {
             case Type.METODO:
                 return null
@@ -70,10 +70,12 @@ class Declaracion{
                     }
                     if (v.type == this.type) {
                         if (tabla.newSymbol(this.id, new Value(v.value, this.type, Type.VALOR, this.fila, this.columna),this.type, Type.VARIABLE, this.fila, this.columna)) {
+                            global.newSymbol(this.id,this.type, Type.VARIABLE, ambito, this.fila, this.columna)
                             return null
                         }
                     }
                 }
+                global.newError(Type.SEMANTICO, "No se pudo asignar valor, null pointer exception.", this.fila, this.columna)
                 return Type.ERROR
         }
     }

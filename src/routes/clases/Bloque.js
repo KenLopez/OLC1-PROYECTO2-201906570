@@ -8,14 +8,20 @@ class Bloque{
         this.columna = _columna
     }
 
-    ejecutar(table, global){
+    ejecutar(table, global, ambito){
         for (let index = 0; index < this.instrucciones.length; index++) {
             const instruccion = this.instrucciones[index]
-            let res = instruccion.ejecutar(table, global)
+            let res = instruccion.ejecutar(table, global, ambito)
             if (res == Type.ERROR) {
                 this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+instruccion.type,instruccion.fila, instruccion.columna)
+                return Type.ERROR
+            }else if (res == Type.BREAK) {
+                return Type.BREAK
+            }else if (res == Type.CONTINUE) {
+                return Type.CONTINUE
             }
         }
+        return null
     }
 
 

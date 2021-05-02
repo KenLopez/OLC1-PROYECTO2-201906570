@@ -19,15 +19,23 @@ class If{
         }
     }
 
-    ejecutar(table, global){
+    ejecutar(table, global, ambito){
+        let current = ambito+'_'+Type.IF
         let bandera = true
         for (let index = 0; index < this.condiciones.length; index++) {
             const condicion = this.condiciones[index]
-            let res = condicion.ejecutar(table, this)
+            let res = condicion.ejecutar(table, global)
             if (res!=null) {
                 if (res.type == Type.BOOLEAN) {
                     if (res.value) {
-                        this.bloques[index].ejecutar(new SymbolTable(table), global)
+                        let res = this.bloques[index].ejecutar(new SymbolTable(table), global, current)
+                        if (res == Type.ERROR) {
+                            return Type.ERROR
+                        }else if (res == Type.BREAK) {
+                            return Type.BREAK
+                        }else if (res == Type.CONTINUE) {
+                            return Type.CONTINUE
+                        }
                         bandera = false
                         break
                     }
@@ -41,7 +49,14 @@ class If{
             }
         }
         if (bandera && this.else !=null) {
-            this.else.ejecutar(this.symbolTable, global)
+            let res = this.else.ejecutar(this.symbolTable, global, current)
+            if (res == Type.ERROR) {
+                return Type.ERROR
+            }else if (res == Type.BREAK) {
+                return Type.BREAK
+            }else if (res == Type.CONTINUE) {
+                return Type.CONTINUE
+            }
         }
         return null
     }

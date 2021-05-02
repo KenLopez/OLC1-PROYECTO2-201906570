@@ -14,6 +14,7 @@
    const While = require('../clases/While.js')
    const DoWhile = require('../clases/DoWhile.js')
    const For = require('../clases/For.js')
+   const Control = require('../clases/Control.js')
    var program = new Global()
 %}
 
@@ -160,7 +161,6 @@ GLOBAL
    |DOWHILE             {$$ = $1}
    |FOR
    |PRINT SYNC          
-   |OPTERNARIO SYNC
    |LLAMADA SYNC
    |MAIN SYNC
 ;
@@ -183,6 +183,7 @@ INSTRUCCION
    |FOR                 {$$ = $1;}
    |PRINT SYNC          {$$ = $1;}
    |LLAMADA SYNC        {$$ = $1;}
+   
 ;
 
 
@@ -303,8 +304,8 @@ FOR
 
 TRANSFERENCIA
    :retorno 
-   |continuar 
-   |romper 
+   |continuar  {$$ = new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column)}
+   |romper     {$$ = new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column)}
 ;
 
 

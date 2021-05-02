@@ -34,6 +34,7 @@ class Asignacion{
                         return Type.ERROR
                     }
                 }else{
+                    global.newError(Type.SEMANTICO, "No se pudo asignar, null pointer exception.", this.fila, this.columna)
                     return Type.ERROR
                 }
         }
