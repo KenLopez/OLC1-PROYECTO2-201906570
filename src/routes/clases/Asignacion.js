@@ -14,19 +14,28 @@ class Asignacion{
         var v
         switch (this.typeExp) {
             case Type.INCREMENTO:
-                tabla.increment(this.id, this.fila, this.columna,global)
-                return null
+                if (tabla.increment(this.id, this.fila, this.columna,global)) {
+                    return null
+                }else{
+                    return Type.ERROR
+                }
             case Type.DECREMENTO:
-                tabla.decrement(this.id, this.fila, this.columna, global)
-                return null
+                if (tabla.decrement(this.id, this.fila, this.columna,global)) {
+                    return null
+                }else{
+                    return Type.ERROR
+                }
             default:
                 v = this.value.ejecutar(tabla, global)
                 if (v!=null) {
-                    tabla.updateSymbol(this.id, new Value(v.value, v.type, Type.VALOR, v.fila, v.columna),this.fila, this.columna,global)
+                    if (tabla.updateSymbol(this.id, new Value(v.value, v.type, Type.VALOR, v.fila, v.columna),this.fila, this.columna,global)) {
+                        return null
+                    }else{
+                        return Type.ERROR
+                    }
                 }else{
-                    
+                    return Type.ERROR
                 }
-                return null
         }
     }
 }

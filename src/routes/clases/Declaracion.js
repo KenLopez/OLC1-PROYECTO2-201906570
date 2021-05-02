@@ -69,10 +69,12 @@ class Declaracion{
                         }
                     }
                     if (v.type == this.type) {
-                        tabla.newSymbol(this.id, new Value(v.value, this.type, Type.VALOR, this.fila, this.columna),this.type, Type.VARIABLE, this.fila, this.columna)
+                        if (tabla.newSymbol(this.id, new Value(v.value, this.type, Type.VALOR, this.fila, this.columna),this.type, Type.VARIABLE, this.fila, this.columna)) {
+                            return null
+                        }
                     }
                 }
-                return null
+                return Type.ERROR
         }
     }
 }

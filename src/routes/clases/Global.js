@@ -35,6 +35,7 @@ class Global{
         for (let index = 0; index < this.instrucciones.length; index++) {
             const instruccion = this.instrucciones[index]
             let res = instruccion.ejecutar(this.symbolTable, this)
+            console.log(res)
             if (res == Type.ERROR) {
                 this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+instruccion.type,instruccion.fila, instruccion.columna)
             }

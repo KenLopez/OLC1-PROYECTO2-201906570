@@ -50,5 +50,6 @@ const Type = {
     SINTACTICO:         'SINTÁCTICO',
     SEMANTICO:          'SEMANTICO',
     ERROR:              'ERROR',
+    BLOQUE:             'BLOQUE',
 }
 module.exports = Type;

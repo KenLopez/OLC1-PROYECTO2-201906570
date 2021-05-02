@@ -9,6 +9,11 @@
    const Declaracion = require('../clases/Declaracion.js')
    const Symbol = require('../clases/Symbol.js')
    const Asignacion = require('../clases/Asignacion.js')
+   const If = require('../clases/If.js')
+   const Bloque = require('../clases/Bloque.js')
+   const While = require('../clases/While.js')
+   const DoWhile = require('../clases/DoWhile.js')
+   const For = require('../clases/For.js')
    var program = new Global()
 %}
 
@@ -140,21 +145,21 @@ INICIO
 
 /*BLOQUE GLOBAL*/
 GLOBALES
-   :GLOBALES GLOBAL
-   |GLOBAL
-   |error SYNC {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
+   :GLOBALES GLOBAL  {program.instrucciones.push($2);}
+   |GLOBAL           {program.instrucciones.push($1);}
+   |error SYNC       {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 GLOBAL
-   :DECLARACION SYNC    {program.instrucciones.push($1)}
-   |ASIGNACION SYNC     {program.instrucciones.push($1)}
+   :DECLARACION SYNC    
+   |ASIGNACION SYNC     
    |FUNCION
-   |IF
+   |IF                  {$$ = new If($1,this._$.first_line, this._$.first_column);}                 
    |SWITCH
-   |WHILE
-   |DOWHILE
+   |WHILE               {$$ = $1}
+   |DOWHILE             {$$ = $1}
    |FOR
-   |PRINT SYNC          {program.instrucciones.push($1)}
+   |PRINT SYNC          
    |OPTERNARIO SYNC
    |LLAMADA SYNC
    |MAIN SYNC
@@ -163,32 +168,33 @@ GLOBAL
 /*BLOQUE LOCAL*/
 INSTRUCCIONES
    :INSTRUCCIONES INSTRUCCION
-   |INSTRUCCION
+   |INSTRUCCION 
    |error SYNC {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 INSTRUCCION
-   :DECLARACION SYNC
-   |ASIGNACION SYNC
-   |TRANSFERENCIA SYNC
-   |IF
-   |SWITCH
-   |WHILE
-   |DOWHILE
-   |FOR
-   |PRINT SYNC
-   |LLAMADA SYNC
+   :DECLARACION SYNC    {$$ = $1;}
+   |ASIGNACION SYNC     {$$ = $1;}
+   |TRANSFERENCIA SYNC  {$$ = $1;}
+   |IF                  {$$ = new If($1,this._$.first_line, this._$.first_column);}
+   |SWITCH              {$$ = $1;}
+   |WHILE               {$$ = $1;}
+   |DOWHILE             {$$ = $1;}
+   |FOR                 {$$ = $1;}
+   |PRINT SYNC          {$$ = $1;}
+   |LLAMADA SYNC        {$$ = $1;}
 ;
 
 
 
 BLOQUE
-   :llavea BLOQUE2
+   :llavea BLOQUE2         {$$= new Bloque($2, this._$.first_line, this._$.first_column);}
 ;
 
 BLOQUE2
-   :INSTRUCCION BLOQUE2
-   |llavec
+   :INSTRUCCION BLOQUE2    {$2.unshift($1); $$ = $2;}
+   |llavec                 {$$=[];}
+   |error SYNC             {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 /*FUNCIONES NATIVAS*/
@@ -210,7 +216,7 @@ NATIVA
 
 /*VARIABLES*/
 DECLARACION
-   :TYPE id                                                              {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
+   :TYPE id                                                                   {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
    |TYPE id igual EXPRL                                                       {$$ = new Declaracion($2, $4, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
    |TYPE id igual CASTEO 
    |TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
@@ -283,16 +289,16 @@ PARAM
 
 /*CICLOS*/
 WHILE 
-   :mientras parena EXPRL parenc BLOQUE
+   :mientras parena EXPRL parenc BLOQUE   {$$ = new While($3, $5, this._$.first_line, this._$.first_column)}
 ;
 
 DOWHILE
-   :do BLOQUE mientras parena EXPRL parenc SYNC
+   :has BLOQUE mientras parena EXPRL parenc SYNC {$$ = new DoWhile($5, $2, this._$.first_line, this._$.first_column)}
 ;
 
 FOR 
-   :para parena ASIGNACION dospt EXPRL dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
-   |para parena DECLARACION dospt EXPRL dospt ASIGNACION parenc llavea INSTRUCCIONES llavec
+   :para parena ASIGNACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE    {$$ = new For($3,$5,$7,$9,this._$.first_line, this._$.first_column)}
+   |para parena DECLARACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE   {$$ = new For($3,$5,$7,$9,this._$.first_line, this._$.first_column)}
 ;
 
 TRANSFERENCIA
@@ -308,17 +314,17 @@ OPTERNARIO
 ;
 
 IF
-   :IFSOLO
-   |IFSOLO ELSE
+   :IFSOLO        {$$=$1;}            
+   |IFSOLO ELSE   {$1.push(...$2);}
 ;
 
 ELSE
-   :sino BLOQUE
-   |sino IF
+   :sino BLOQUE      {$$ = [{exp: null, block: $2}];}  
+   |sino IF          {$$ = $2;}
 ;
 
 IFSOLO
-   :si parena EXPRL parenc BLOQUE
+   :si parena EXPRL parenc BLOQUE   {$$ = [{exp: $3, block: $5}];}
 ;
 
 SWITCH
