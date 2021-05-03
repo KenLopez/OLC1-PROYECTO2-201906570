@@ -12,12 +12,12 @@ class Symbol{
 
     ejecutar(tabla, global){
         this.value = tabla.find(this.id)
-        if (this.value == null) {
+        if (this.value == Type.ERROR) {
             global.newError(Type.SEMANTICO, this.id + ' no está definido.', this.fila, this.columna)
             return Type.ERROR
         }
         var v = this.value.value.ejecutar(tabla, global)
-        if (v == null) {
+        if (v == Type.ERROR) {
             global.newError(Type.SEMANTICO, 'No se pudo obtener el valor de '+this.id+' , null pointer exception.', this.fila, this.columna)
             return Type.ERROR
         }

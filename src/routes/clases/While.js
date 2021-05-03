@@ -12,12 +12,12 @@ class While{
     ejecutar(table, global, ambito){
         let current = ambito+'_'+Type.WHILE
         let v = this.condicion.ejecutar(table, global)
-        if (v!=null){
+        if (v!=Type.ERROR){
             if (v.type == Type.BOOLEAN){
                 while (this.condicion.ejecutar(table, global).value) {
                     let res = this.bloque.ejecutar(new SymbolTable(table),global,current)
                     if (res == Type.ERROR) {
-                        this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+this.type,this.fila, this.columna)
+                        global.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+this.type,this.fila, this.columna)
                         return Type.ERROR
                     }else if (res == Type.BREAK) {
                         break

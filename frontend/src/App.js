@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Banner from './components/Banner';
 import Editor from './components/Editor';
 import Reporte from './components/Reporte';
+import TablaSymbolos from './components/TablaSymbolos';
 const axios = require('axios').default
 
 function App() {
@@ -13,21 +14,24 @@ function App() {
   const [currentText, setCurrentText] = useState(panes[active].text)
   const [consola, setConsola] = useState('')
   const [errores, setErrores] = useState([])
+  const [symbols, setSymbols] = useState([])
   const [tab, setTab] = useState(0)
   //const [file, setFile] = useState(null)
   var compilar = ()=>{
     var data = ''
     var errores = []
+    var simbolos = []
     async function enviar(){
         let res = await axios.post("http://localhost:3000/compilar", {codigo: currentText});
         data = String(res.data.data)
         errores = res.data.errores
-        console.log(res.data.symbols)
+        simbolos = res.data.symbols
         if (errores.length>0) {
           setTab(1);
         }
         setConsola(String(data))  
         setErrores(errores) 
+        setSymbols(simbolos)
     }
     enviar()
   }
@@ -103,9 +107,14 @@ function App() {
                   errores={errores}
                   />
                   </>
-                ):(
+                ):tab===2?(
                   <>
+                  <TablaSymbolos
+                  symbols={symbols}
+                  />
                   </>
+                ):(
+                  <></>
                 )
               }
             </div>

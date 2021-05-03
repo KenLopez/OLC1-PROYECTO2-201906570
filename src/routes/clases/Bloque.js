@@ -13,7 +13,7 @@ class Bloque{
             const instruccion = this.instrucciones[index]
             let res = instruccion.ejecutar(table, global, ambito)
             if (res == Type.ERROR) {
-                this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+instruccion.type,instruccion.fila, instruccion.columna)
+                global.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+instruccion.type,instruccion.fila, instruccion.columna)
                 return Type.ERROR
             }else if (res == Type.BREAK) {
                 return Type.BREAK

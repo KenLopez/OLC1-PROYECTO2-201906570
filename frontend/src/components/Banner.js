@@ -41,6 +41,9 @@ function Banner(props) {
                   <Button color='orange' onClick={()=>{props.mode(1)}}>Errores</Button>
                 </Menu.Item>
                 <Menu.Item className='opcion'>
+                  <Button color='violet' onClick={()=>{props.mode(2)}}>Símbolos</Button>
+                </Menu.Item>
+                <Menu.Item className='opcion'>
                   <Button color='red'>Gramaticas</Button>
                 </Menu.Item>
             </Menu>

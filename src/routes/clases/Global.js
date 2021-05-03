@@ -78,7 +78,7 @@ class Global{
             const instruccion = this.instrucciones[index]
             let res = instruccion.ejecutar(this.symbolTable, this, Type.GLOBAL)
             if (res == Type.ERROR) {
-                this.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+instruccion.type,instruccion.fila, instruccion.columna)
+                break
             }
         }
     }

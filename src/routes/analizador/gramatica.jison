@@ -97,7 +97,7 @@
 /*Valores*/                                            
 ([0-9])+(["."])([0-9])+                         return 'decimal';
 ([0-9])+                                        return 'entero';  
-([a-zA-Z_])([a-zA-Z0-9_])*                      return 'id';
+([a-zA-Z_])([a-zA-Z0-9_])*                      {yytext = yytext.toUpperCase();return 'id';}
 ["\""]([^"\""])*["\""]                          {yytext = yytext.substring(1,yytext.length-1); return'cadena';}
 [\']([^']|"\\n"|"\\r"|"\\t")[\']                {yytext = yytext.substring(1,yytext.length-1); return'caracter';}
 
@@ -152,24 +152,24 @@ GLOBALES
 ;
 
 GLOBAL
-   :DECLARACION SYNC    
-   |ASIGNACION SYNC     
+   :DECLARACION SYNC    {$$ = $1}    
+   |ASIGNACION SYNC     {$$ = $1}     
    |FUNCION
    |IF                  {$$ = new If($1,this._$.first_line, this._$.first_column);}                 
    |SWITCH
    |WHILE               {$$ = $1}
    |DOWHILE             {$$ = $1}
-   |FOR
-   |PRINT SYNC          
+   |FOR                 {$$ = $1}
+   |PRINT SYNC          {$$ = $1}
    |LLAMADA SYNC
    |MAIN SYNC
 ;
 
 /*BLOQUE LOCAL*/
 INSTRUCCIONES
-   :INSTRUCCIONES INSTRUCCION
-   |INSTRUCCION 
-   |error SYNC {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
+   :INSTRUCCIONES INSTRUCCION    {$$=$2.unshift($1); $$ = $2;}
+   |INSTRUCCION                  {$$=[$1]}
+   |error SYNC                   {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 INSTRUCCION
@@ -200,8 +200,8 @@ BLOQUE2
 
 /*FUNCIONES NATIVAS*/
 PRINT 
-   :print parena EXPRL parenc {$$ = new Print($3, null, Type.PRINT, this._$.first_line, this._$.first_column);}
-   |print parena parenc       {$$ = new Print(null, null, Type.PRINT, this._$.first_line, this._$.first_column);}
+   :print parena EXPRL parenc {$$ = new Print($3, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);}
+   |print parena parenc       {$$ = new Print(null, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);}
 ;
 
 NATIVA
@@ -335,8 +335,8 @@ SWITCH
 ;
 
 CASES
-   :CASES caso dospt INSTRUCCIONES
-   |caso dospt INSTRUCCIONES
+   :CASES caso EXPRL dospt INSTRUCCIONES  {$1.push({exp:$3, block:$5})}
+   |caso EXPRL dospt INSTRUCCIONES        {$$ = [{exp: $2, block: $4}]}
 ;
 
 DEFAULT

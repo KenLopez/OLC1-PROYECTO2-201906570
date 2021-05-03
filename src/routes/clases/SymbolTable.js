@@ -15,16 +15,16 @@ class SymbolTable{
         }
         if (global && (this.padre != null)) {
             let v = this.padre.find(_id) 
-            if (v!=null) {
+            if (v!=Type.ERROR) {
                 return v
             }
         }
-        return null
+        return Type.ERROR
     }
 
     increment(_id, _fila, _columna, global){
         let s = this.find(_id)
-        if (s != null) {
+        if (s != Type.ERROR) {
             switch (s.type) {
                 case Type.INT:
                     s.value = new Value(s.value.value+1, s.type, Type.VALOR,_fila, _columna)
@@ -44,7 +44,7 @@ class SymbolTable{
 
     decrement(_id,_fila, _columna, global){
         let s = this.find(_id)
-        if (s != null) {
+        if (s != Type.ERROR) {
             switch (s.type) {
                 case Type.INT:
                     s.value = new Value(s.value.value-1, s.type, Type.VALOR,_fila, _columna)
@@ -64,7 +64,7 @@ class SymbolTable{
 
     updateSymbol(_id, _value,_fila,_columna, global){
         let s = this.find(_id);
-        if (s != null){
+        if (s != Type.ERROR){
             if (_value.type != s.type) {
                 switch (s.type) {
                     case Type.DOUBLE:
@@ -107,7 +107,7 @@ class SymbolTable{
     }
 
     newSymbol(_id, _value, _type, _typeExp, _fila, _columna){
-        if (this.find(_id,false) == null){
+        if (this.find(_id,false) == Type.ERROR){
             var nuevo = new Symbol(_id, new Value(_value.value, _value.type, _value.typeExp,_value.fila, 
                         _value.columna),_type, _typeExp, _fila, _columna)
             this.symbols.push(nuevo)

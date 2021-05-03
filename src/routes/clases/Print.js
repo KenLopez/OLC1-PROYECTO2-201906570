@@ -10,7 +10,7 @@ class Print{
 
     ejecutar(tabla, global){
         var v = this.value.ejecutar(tabla, global)
-        if (v!=null) {
+        if (v!=Type.ERROR) {
             global.newPrint(v)   
         }else{
             global.newError(Type.SEMANTICO, "No se pudo ejecutar, null pointer exception.", this.fila, this.columna)

@@ -97,10 +97,13 @@ break;
 case 5: case 19: case 33: case 65:
 program.newError(Type.SINTACTICO, "No se esperaba: " + this.$, this._$.first_line, this._$.first_column)
 break;
+case 6: case 7: case 14: case 115:
+this.$ = $$[$0-1]
+break;
 case 9: case 23:
 this.$ = new If($$[$0],this._$.first_line, this._$.first_column);
 break;
-case 11: case 12: case 106: case 113:
+case 11: case 12: case 13: case 106: case 113:
 this.$ = $$[$0]
 break;
 case 20: case 21: case 22: case 28: case 29:
@@ -119,10 +122,10 @@ case 32:
 this.$=[];
 break;
 case 34:
-this.$ = new Print($$[$0-1], null, Type.PRINT, this._$.first_line, this._$.first_column);
+this.$ = new Print($$[$0-1], Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);
 break;
 case 35:
-this.$ = new Print(null, null, Type.PRINT, this._$.first_line, this._$.first_column);
+this.$ = new Print(null, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);
 break;
 case 44:
 this.$ = new Declaracion($$[$0], null, $$[$0-1], Type.DECLARACION, this._$.first_line, this._$.first_column)
@@ -228,9 +231,6 @@ this.$ = new Aritmetica($$[$0-2], $$[$0], Type.POTENCIA, Type.ARITMETICO, this._
 break;
 case 114:
 this.$ = new Unitaria($$[$0], Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column);
-break;
-case 115:
-this.$ = $$[$0-1]
 break;
 case 116:
 this.$ = new Value($$[$0].value, $$[$0].type, Type.VALOR, this._$.first_line, this._$.first_column);
@@ -983,7 +983,7 @@ case 63:return 103;
 break;
 case 64:return 102;  
 break;
-case 65:return 40;
+case 65:yy_.yytext = yy_.yytext.toUpperCase();return 40;
 break;
 case 66:yy_.yytext = yy_.yytext.substring(1,yy_.yytext.length-1); return'cadena';
 break;

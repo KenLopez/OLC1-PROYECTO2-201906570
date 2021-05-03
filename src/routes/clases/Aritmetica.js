@@ -216,7 +216,7 @@ class Aritmetica{
         }
         global.newError(Type.SEMANTICO, 'No se pudo operar: '+izq.type+' '+this.type+' '+der.type +
         '; tipos incompatibles.', this.fila, this.columna )
-        return null
+        return Type.ERROR
     }
 }
 

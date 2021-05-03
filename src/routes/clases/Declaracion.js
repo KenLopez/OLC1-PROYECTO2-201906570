@@ -38,7 +38,7 @@ class Declaracion{
                 return null
             default:
                 let v = this.value.ejecutar(tabla, global)
-                if (v != null) {
+                if (v != Type.ERROR) {
                     if (v.type != this.type) {
                         switch (this.type) {
                             case Type.DOUBLE:

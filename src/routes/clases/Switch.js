@@ -1,13 +1,13 @@
 const SymbolTable = require('./SymbolTable.js')
 const Type = require('./Type.js')
-class If{
-    constructor( _data, _fila, _columna){
+class Switch{
+    constructor( _data, _default, _fila, _columna){
         this.condiciones = []
         this.bloques = []
-        this.type = Type.IF
+        this.type = Type.SWITCH
         this.fila = _fila
         this.columna = _columna
-        this.else = null
+        this.default = _default
         for (let index = 0; index < _data.length; index++) {
             const element = _data[index];
             if(element.exp !=null){
@@ -64,4 +64,4 @@ class If{
 
 }
 
-module.exports = If
+module.exports = Switch
