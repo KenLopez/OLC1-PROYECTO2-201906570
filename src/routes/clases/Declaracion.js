@@ -38,7 +38,7 @@ class Declaracion{
                 return null
             default:
                 let v = this.value.ejecutar(tabla, global)
-                if (v != Type.ERROR) {
+                if ((v != Type.ERROR) && (v != null)) {
                     if (v.type != this.type) {
                         switch (this.type) {
                             case Type.DOUBLE:
@@ -72,6 +72,9 @@ class Declaracion{
                         if (tabla.newSymbol(this.id, new Value(v.value, this.type, Type.VALOR, this.fila, this.columna),this.type, Type.VARIABLE, this.fila, this.columna)) {
                             global.newSymbol(this.id,this.type, Type.VARIABLE, ambito, this.fila, this.columna)
                             return null
+                        }else{
+                            global.newError(Type.SEMANTICO,'No se pudo declarar: '+ this.id + ', ya fue declarado.', this.fila, this.columna)
+                            return Type.ERROR
                         }
                     }
                 }

@@ -1,59 +1,58 @@
 const SymbolTable = require('./SymbolTable.js')
+const Logica = require('./Logica.js')
 const Type = require('./Type.js')
 class Switch{
-    constructor( _data, _default, _fila, _columna){
+    constructor( _exp,_data, _default, _fila, _columna){
+        this.exp = _exp
         this.condiciones = []
         this.bloques = []
         this.type = Type.SWITCH
         this.fila = _fila
         this.columna = _columna
         this.default = _default
-        for (let index = 0; index < _data.length; index++) {
-            const element = _data[index];
-            if(element.exp !=null){
+        if (_data!=null) {
+            for (let index = 0; index < _data.length; index++) {
+                const element = _data[index];
                 this.condiciones.push(element.exp)
                 this.bloques.push(element.block)
-            }else{
-                this.else = element.block
-            }
+            }    
         }
     }
 
     ejecutar(table, global, ambito){
-        let current = ambito+'_'+Type.IF
+        let val = this.exp.ejecutar(table, global)
+        if ((val == Type.ERROR) || (val==null)) {
+            global.newError(Type.SEMANTICO, 'Expresión no es un valor.', this.fila, this.columna )
+            return Type.ERROR
+        }
+        let current = ambito+'_'+Type.SWITCH
         let bandera = true
         for (let index = 0; index < this.condiciones.length; index++) {
             const condicion = this.condiciones[index]
             let res = condicion.ejecutar(table, global)
             if (res!=Type.ERROR) {
-                if (res.type == Type.BOOLEAN) {
-                    if (res.value) {
-                        let res = this.bloques[index].ejecutar(new SymbolTable(table), global, current)
-                        if (res == Type.ERROR) {
-                            return Type.ERROR
-                        }else if (res == Type.BREAK) {
-                            return Type.BREAK
-                        }else if (res == Type.CONTINUE) {
-                            return Type.CONTINUE
-                        }
+                let pass = new Logica(val,res,Type.IGUAL,Type.LOGICO,condicion.fila, condicion.columna)
+                let tmp = pass.ejecutar(table,global, false)
+                if((tmp!=null) && tmp.value){
+                    console.log(this.bloques[index])
+                    let out = this.bloques[index].ejecutar(table, global, current)
+                    if (out == Type.ERROR) {
+                        global.newError(Type.SEMANTICO, "No se pudo ejecutar la instrucción: "+this.type, condicion.fila, condicion.columna)
+                        return Type.ERROR
+                    }else if (out == Type.BREAK) {
                         bandera = false
-                        break
+                        break                        
                     }
-                }else{
-                    global.newError(Type.SEMANTICO, "La expresión no es una condicion", condicion.fila, condicion.columna)
-                    return Type.ERROR
                 }
             }else{
                 global.newError(Type.SEMANTICO, "No se pudo ejecutar, null pointer exception.", condicion.fila, condicion.columna)
                 return Type.ERROR
             }
         }
-        if (bandera && this.else !=null) {
-            let res = this.else.ejecutar(this.symbolTable, global, current)
+        if (bandera && (this.default !=null)) {
+            let res = this.default.ejecutar(this.symbolTable, global, current)
             if (res == Type.ERROR) {
                 return Type.ERROR
-            }else if (res == Type.BREAK) {
-                return Type.BREAK
             }else if (res == Type.CONTINUE) {
                 return Type.CONTINUE
             }

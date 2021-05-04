@@ -15,7 +15,9 @@
    const DoWhile = require('../clases/DoWhile.js')
    const For = require('../clases/For.js')
    const Control = require('../clases/Control.js')
+   const Switch = require('../clases/Switch.js')
    var program = new Global()
+   var cadena ='';
 %}
 
 /*Analizador Léxico*/
@@ -23,6 +25,7 @@
 %lex
 
 %options case-insensitive
+%x str
 
 %%
 
@@ -97,14 +100,30 @@
 /*Valores*/                                            
 ([0-9])+(["."])([0-9])+                         return 'decimal';
 ([0-9])+                                        return 'entero';  
-([a-zA-Z_])([a-zA-Z0-9_])*                      {yytext = yytext.toUpperCase();return 'id';}
-["\""]([^"\""])*["\""]                          {yytext = yytext.substring(1,yytext.length-1); return'cadena';}
-[\']([^']|"\\n"|"\\r"|"\\t")[\']                {yytext = yytext.substring(1,yytext.length-1); return'caracter';}
+([a-zA-Z_ñÑ])([a-z0-9A-Z_ñÑ])*                          {yytext = yytext.toUpperCase();return 'id';}
+["]                                                     {cadena = '';this.begin("str");}
+<str>[^"\\]+                                            {cadena += yytext;}
+<str>"\\\""                                             {cadena += '\"';}
+<str>"\\n"                                              {cadena += '\n';}
+<str>"\\t"                                              {cadena += '\t';}
+<str>"\\\\"                                             {cadena += '\\';}
+<str>"\\\'"                                             {cadena += '\'';}
+<str>["]                                                {yytext = cadena; this.popState(); return 'cadena'}
+<str>.                                                  {cadena=''; this.popState();program.newError(
+                                                         Type.LEXICO, 'El símbolo: '+cadena+', no se pudo'+
+                                                         ' reconocer.', yylloc.first_line, yylloc.first_column)}
+[\']("\\n"|"\\r"|"\\t"|"\\'"|"\\\""|"\\\\"|[^\'])[\']   {yytext = yytext.substring(1,yytext.length-1); 
+                                                         yytext = yytext.replace(/\\n/g, '\n')
+                                                         yytext = yytext.replace(/\\r/g, '\r')
+                                                         yytext = yytext.replace(/\\t/g, '\t')
+                                                         yytext = yytext.replace(/\\\'/g, '\'')
+                                                         yytext = yytext.replace(/\\\"/g, '\"')
+                                                         yytext = yytext.replace(/\\\\/g, '\\')
+                                                         return'caracter';}
+<<EOF>>                                                  return 'EOF';
 
-<<EOF>>                                         return 'EOF';
-
-.                                               {program.newError(Type.LEXICO, 'El símbolo: '+yytext+', no es parte'+
-                                                ' del alfabeto.', yylloc.first_line, yylloc.first_column)}
+.                                               {program.newError(Type.LEXICO, 'El símbolo: '+yytext+', no se pudo'+
+                                                ' reconocer.', yylloc.first_line, yylloc.first_column)}
 
 /lex
 
@@ -154,20 +173,20 @@ GLOBALES
 GLOBAL
    :DECLARACION SYNC    {$$ = $1}    
    |ASIGNACION SYNC     {$$ = $1}     
-   |FUNCION
+   //|FUNCION
    |IF                  {$$ = new If($1,this._$.first_line, this._$.first_column);}                 
-   |SWITCH
+   |SWITCH              {$$ = $1}
    |WHILE               {$$ = $1}
    |DOWHILE             {$$ = $1}
    |FOR                 {$$ = $1}
    |PRINT SYNC          {$$ = $1}
-   |LLAMADA SYNC
-   |MAIN SYNC
+   //|LLAMADA SYNC
+   //|MAIN SYNC
 ;
 
 /*BLOQUE LOCAL*/
 INSTRUCCIONES
-   :INSTRUCCIONES INSTRUCCION    {$$=$2.unshift($1); $$ = $2;}
+   :INSTRUCCION INSTRUCCIONES    {$$=$2.unshift($1); $$ = $2;}
    |INSTRUCCION                  {$$=[$1]}
    |error SYNC                   {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
@@ -182,7 +201,7 @@ INSTRUCCION
    |DOWHILE             {$$ = $1;}
    |FOR                 {$$ = $1;}
    |PRINT SYNC          {$$ = $1;}
-   |LLAMADA SYNC        {$$ = $1;}
+   //|LLAMADA SYNC        {$$ = $1;}
    
 ;
 
@@ -219,10 +238,10 @@ NATIVA
 DECLARACION
    :TYPE id                                                                   {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
    |TYPE id igual EXPRL                                                       {$$ = new Declaracion($2, $4, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
-   |TYPE id igual CASTEO 
-   |TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
-   |TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
-   |tlista TYPE id igual nuevo tlista menor TYPE mayor   
+   //|TYPE id igual CASTEO 
+   //|TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
+   //|TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
+   //|tlista TYPE id igual nuevo tlista menor TYPE mayor   
 ;
 
 CASTEO
@@ -231,11 +250,11 @@ CASTEO
 
 ASIGNACION
    :id igual EXPRL            {$$ = new Asignacion($1, $3, Type.ASIGNACION, this._$.first_line, this._$.first_column)}          
-   |id igual CASTEO
+   //|id igual CASTEO
    |id incremento             {$$ = new Asignacion($1, null, Type.INCREMENTO, this._$.first_line, this._$.first_column)}
    |id decremento             {$$ = new Asignacion($1, null, Type.DECREMENTO, this._$.first_line, this._$.first_column)} 
-   |ACCESOVECTOR igual EXPRL 
-   |ACCESOLISTA igual EXPRL 
+   //|ACCESOVECTOR igual EXPRL 
+   //|ACCESOLISTA igual EXPRL 
 ;
 
 TYPE
@@ -329,25 +348,25 @@ IFSOLO
 ;
 
 SWITCH
-   :fswitch parena EXPRL parenc llavea CASES llavec
-   |fswitch parena EXPRL parenc llavea DEFAULT llavec
-   |fswitch parena EXPRL parenc llavea CASES DEFAULT llavec
+   :fswitch parena EXPRL parenc llavea CASES llavec            {$$ = new Switch($3, $6, null, this._$.first_line, this._$.first_column)}
+   |fswitch parena EXPRL parenc llavea DEFAULT llavec          {$$ = new Switch($3, null, $6, this._$.first_line, this._$.first_column)}
+   |fswitch parena EXPRL parenc llavea CASES DEFAULT llavec    {$$ = new Switch($3, $6, $7, this._$.first_line, this._$.first_column)}
 ;
 
 CASES
-   :CASES caso EXPRL dospt INSTRUCCIONES  {$1.push({exp:$3, block:$5})}
-   |caso EXPRL dospt INSTRUCCIONES        {$$ = [{exp: $2, block: $4}]}
+   :CASES caso EXPRL dospt INSTRUCCIONES  {$1.push({exp:$3, block:new Bloque($5, this._$.first_line, this._$.first_column)})}
+   |caso EXPRL dospt INSTRUCCIONES        {$$ = [{exp: $2, block: new Bloque($4, this._$.first_line, this._$.first_column)}]}
 ;
 
 DEFAULT
-   :defecto dospt INSTRUCCIONES
+   :defecto dospt INSTRUCCIONES           {$$ = new Bloque($3, this._$.first_line, this._$.first_column)}
 ;
 
 
 /*EXPRESIONES Y VALORES*/
 EXPRL
-   :OPTERNARIO
-   |EXPRL ologico EXPRL       {$$ = new Logica($1, $3, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column);}
+   ://OPTERNARIO
+   EXPRL ologico EXPRL       {$$ = new Logica($1, $3, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column);}
    |EXPRL ylogico EXPRL       {$$ = new Logica($1, $3, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column);}
    |exclamacion EXPRL         {$$ = new Unitaria($2, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column);}
    |EXPRL equals EXPRL        {$$ = new Logica($1, $3, Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
@@ -378,10 +397,10 @@ EXPVAL
    |vtrue                  {$$ = new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
    |vfalse                 {$$ = new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
    |id                     {$$ = new Symbol($1, null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column );}
-   |ACCESOVECTOR
-   |ACCESOLISTA
-   |NATIVA
-   |LLAMADA
+   //|ACCESOVECTOR
+   //|ACCESOLISTA
+   //|NATIVA
+   //|LLAMADA
 ;
 
 NUM

@@ -212,7 +212,8 @@ class Logica{
         }
         if (aux) {
             global.newError(Type.SEMANTICO, 'No se pudo operar: '+izq.type+' '+this.type+' '+der.type +
-            '; tipos incompatibles.', this.fila, this.columna )    
+            '; tipos incompatibles.', this.fila, this.columna )
+            return Type.ERROR    
         }
         return null
     }

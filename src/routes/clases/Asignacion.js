@@ -27,7 +27,7 @@ class Asignacion{
                 }
             default:
                 v = this.value.ejecutar(tabla, global)
-                if (v!=null) {
+                if ((v!=null) && (v!=Type.ERROR)) {
                     if (tabla.updateSymbol(this.id, new Value(v.value, v.type, Type.VALOR, v.fila, v.columna),this.fila, this.columna,global)) {
                         return null
                     }else{

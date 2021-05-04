@@ -19,6 +19,7 @@ class Global{
             fila: _fila,
             columna: _columna
         })
+        this.output+='Error: '+_type+'; '+_mensaje+'. En línea: '+_fila+", columna: "+_columna+'\n'
     }
 
     newPrint(string){
