@@ -1,6 +1,7 @@
 const SymbolTable = require('./SymbolTable.js')
 const Type = require('./Type.js')
-const Value = require('./Value.js')
+const fs = require('fs')
+const {exec} = require('child_process')
 class Global{
     constructor(){
         this.instrucciones = []
@@ -9,7 +10,37 @@ class Global{
         this.symbolTable = new SymbolTable(null)
         this.symbols = []
         this.errores = []
+        this.ast = null
         this.output = ''
+    }
+
+    graficar(){
+        var counter = {counter:0}
+        let tmp = this.ast.graficar(counter)
+        let data = tmp.nodos+"\n"+tmp.enlaces
+        data = "digraph ast{\n" + data + "}"
+        fs.writeFile('ast.dot', data, function (err) {
+            if (err) throw err;
+            console.log('ast creado');
+        })
+        exec('dot -Tpng ast.dot -o ast.png', (error, stdout,stderr)=>{
+            if (error) {
+                console.log(`error: ${error.message}`)
+                return
+            }
+            if (stderr) {
+                console.log(`error: ${stderr}`)
+                return
+            }
+            console.log(stdout)
+        })
+        if (this.errores.length==0) {
+            var bitmap = fs.readFileSync('ast.png');
+            let base =  new Buffer.from(bitmap).toString('base64'); 
+            return base
+        }else{
+            return null
+        }
     }
 
     newError(_type, _mensaje, _fila, _columna){
@@ -19,7 +50,7 @@ class Global{
             fila: _fila,
             columna: _columna
         })
-        this.output+='Error: '+_type+'; '+_mensaje+'. En línea: '+_fila+", columna: "+_columna+'\n'
+        this.output+='Error: '+_type+'; '+_mensaje+' En línea: '+_fila+", columna: "+_columna+'\n'
     }
 
     newPrint(string){
@@ -32,20 +63,6 @@ class Global{
 
     getErrors(){
         return this.errores
-    }
-
-    casteoImplicito(val1, val2){
-        let r1 = new Value(val1.value, val1.type, val1.typeExp, val1.fila, val1.columna)
-        let r2 = new Value(val2.value, val2.type, val2.typeExp, val2.fila, val2.columna)
-        switch (val1.type) {
-            case Type.INT:
-                switch (val2.type) {
-                    case Type.INT:
-                        
-                
-                }
-        
-        }
     }
 
 

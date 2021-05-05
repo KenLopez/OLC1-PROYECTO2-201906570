@@ -83,7 +83,16 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1: case 2:
+case 1:
+
+      program.ast = new Nodo('INICIO', [$$[$0-1]])
+      var p = program
+      program = new Global()
+      p.ejecutar()
+      return p;
+   
+break;
+case 2:
 
       var p = program
       program = new Global()
@@ -91,194 +100,221 @@ case 1: case 2:
       return p;
    
 break;
-case 3: case 4:
-program.instrucciones.push($$[$0]);
+case 3:
+program.instrucciones.push($$[$0].s); this.$ = new Nodo('GLOBALES', [$$[$0-1], $$[$0].n])
+break;
+case 4:
+program.instrucciones.push($$[$0].s); this.$ = new Nodo('GLOBALES', [$$[$0].n])
 break;
 case 5: case 16: case 29: case 54:
 program.newError(Type.SINTACTICO, "No se esperaba: " + this.$, this._$.first_line, this._$.first_column)
 break;
-case 6: case 7: case 13: case 103:
-this.$ = $$[$0-1]
+case 6: case 7: case 13:
+this.$ = {s:$$[$0-1].s, n:new Nodo('GLOBAL', [$$[$0-1].n, $$[$0].n])}
 break;
-case 8: case 20:
-this.$ = new If($$[$0],this._$.first_line, this._$.first_column);
+case 8:
+this.$ = {s:new If($$[$0].s,this._$.first_line, this._$.first_column),n:new Nodo('GLOBAL', [$$[$0].n])};
 break;
-case 9: case 10: case 11: case 12: case 94: case 101:
-this.$ = $$[$0]
+case 9: case 10: case 11: case 12:
+this.$ = {s:$$[$0].s, n:new Nodo('GLOBAL', [$$[$0].n])}
 break;
 case 14:
-this.$=$$[$0].unshift($$[$0-1]); this.$ = $$[$0];
+$$[$0].s.unshift($$[$0-1].s);this.$={s:$$[$0].s,n:new Nodo('INSTRUCCIONES', [$$[$0-1].n, $$[$0].n])}
 break;
 case 15:
-this.$=[$$[$0]]
+this.$={s:[$$[$0].s], n:new Nodo('INSTRUCCIONES', [$$[$0].n])}
 break;
 case 17: case 18: case 19: case 25:
-this.$ = $$[$0-1];
+this.$ = {s:$$[$0-1].s,n:new Nodo('INSTRUCCION', [$$[$0-1].n, $$[$0].n])};
 break;
-case 21: case 22: case 23: case 24: case 77:
-this.$ = $$[$0];
+case 20:
+this.$ = {s:new If($$[$0].s,this._$.first_line, this._$.first_column),n:new Nodo('INSTRUCCION', [$$[$0].n])};
+break;
+case 21: case 22: case 23: case 24:
+this.$ = {s:$$[$0].s,n:new Nodo('INSTRUCCION', [$$[$0].n])};
 break;
 case 26:
-this.$= new Bloque($$[$0], this._$.first_line, this._$.first_column);
+this.$= {s:new Bloque($$[$0].s, this._$.first_line, this._$.first_column), n: new Nodo('BLOQUE', [new Nodo($$[$0-1],null), $$[$0].n])};
 break;
 case 27:
-$$[$0].unshift($$[$0-1]); this.$ = $$[$0];
+$$[$0].s.unshift($$[$0-1].s); this.$ = {s:$$[$0].s, n:new Nodo('BLOQUE2', [$$[$0-1].n, $$[$0].n])};
 break;
 case 28:
-this.$=[];
+this.$={s:[], n:new Nodo('BLOQUE2', [new Nodo($$[$0], null)])};
 break;
 case 30:
-this.$ = new Print($$[$0-1], Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);
+this.$ = {s:new Print($$[$0-1].s, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column),n:new Nodo('PRINT', [new Nodo($$[$0-3],null),new Nodo($$[$0-2], null), $$[$0-1].n, new Nodo($$[$0],null)])};
 break;
 case 31:
-this.$ = new Print(null, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);
+this.$ = {s:new Print(null, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column),n:new Nodo('PRINT', [new Nodo($$[$0-2],null),new Nodo($$[$0-1],null),new Nodo($$[$0],null)])};
 break;
 case 40:
-this.$ = new Declaracion($$[$0], null, $$[$0-1], Type.DECLARACION, this._$.first_line, this._$.first_column)
+this.$ = {s:new Declaracion($$[$0], null, $$[$0-1].s, Type.DECLARACION, this._$.first_line, this._$.first_column),n:new Nodo('DECLARACION', [$$[$0-1].n, new Nodo($$[$0], null)])}
 break;
 case 41:
-this.$ = new Declaracion($$[$0-2], $$[$0], $$[$0-3], Type.DECLARACION, this._$.first_line, this._$.first_column)
+this.$ = {s:new Declaracion($$[$0-2], $$[$0].s, $$[$0-3].s, Type.DECLARACION, this._$.first_line, this._$.first_column),n:new Nodo('DECLARACION', [$$[$0-3].n, new Nodo($$[$0-2], null), new Nodo($$[$0-1], null), $$[$0].n])}
 break;
 case 43:
-this.$ = new Asignacion($$[$0-2], $$[$0], Type.ASIGNACION, this._$.first_line, this._$.first_column)
+this.$ = {s:new Asignacion($$[$0-2], $$[$0].s, Type.ASIGNACION, this._$.first_line, this._$.first_column), n:new Nodo('ASIGNACION', [new Nodo($$[$0-2], null), new Nodo($$[$0-1], null), $$[$0].n])}
 break;
 case 44:
-this.$ = new Asignacion($$[$0-1], null, Type.INCREMENTO, this._$.first_line, this._$.first_column)
+this.$ = {s:new Asignacion($$[$0-1], null, Type.INCREMENTO, this._$.first_line, this._$.first_column),n:new Nodo('ASIGNACION', [new Nodo($$[$0-1], null), new Nodo($$[$0], null)])}
 break;
 case 45:
-this.$ = new Asignacion($$[$0-1], null, Type.DECREMENTO, this._$.first_line, this._$.first_column)
+this.$ = {s:new Asignacion($$[$0-1], null, Type.DECREMENTO, this._$.first_line, this._$.first_column),n:new Nodo('ASIGNACION', [new Nodo($$[$0-1], null), new Nodo($$[$0], null)])}
 break;
 case 46:
-this.$ = Type.INT;
+this.$ = {s:Type.INT,n:new Nodo('TYPE', [new Nodo($$[$0],null)])};
 break;
 case 47:
-this.$ = Type.STRING;
+this.$ = {s:Type.STRING,n:new Nodo('TYPE', [new Nodo($$[$0],null)])};
 break;
 case 48:
-this.$ = Type.DOUBLE;
+this.$ = {s:Type.DOUBLE,n:new Nodo('TYPE', [new Nodo($$[$0],null)])};
 break;
 case 49:
-this.$ = Type.BOOLEAN;
+this.$ = {s:Type.BOOLEAN,n:new Nodo('TYPE', [new Nodo($$[$0],null)])};
 break;
 case 50:
-this.$ = Type.CHAR;
+this.$ = {s:Type.CHAR,n:new Nodo('TYPE', [new Nodo($$[$0],null)])};
+break;
+case 53:
+this.$ = {s:$$[$0], n:new Nodo('SYNC', [new Nodo($$[$0], null)])}
 break;
 case 66:
-this.$ = new While($$[$0-2], $$[$0], this._$.first_line, this._$.first_column)
+this.$ = {s:new While($$[$0-2].s, $$[$0].s, this._$.first_line, this._$.first_column),n:new Nodo('WHILE', [new Nodo($$[$0-4],null), new Nodo($$[$0-3],null), $$[$0-2].n, new Nodo($$[$0-1],null), $$[$0].n])}
 break;
 case 67:
-this.$ = new DoWhile($$[$0-2], $$[$0-5], this._$.first_line, this._$.first_column)
+this.$ = {s:new DoWhile($$[$0-2].s, $$[$0-5].s, this._$.first_line, this._$.first_column), 
+                                                  n:new Nodo('DOWHILE',[new Nodo($$[$0-6], null), $$[$0-5].n, new Nodo($$[$0-4],null), new Nodo($$[$0-3],null),$$[$0-2].n, new Nodo($$[$0-1],null), $$[$0].n])}
 break;
-case 68: case 69:
-this.$ = new For($$[$0-6],$$[$0-4],$$[$0-2],$$[$0],this._$.first_line, this._$.first_column)
+case 68:
+this.$ = {s:new For($$[$0-6].s,$$[$0-4].s,$$[$0-2].s,$$[$0].s,this._$.first_line, this._$.first_column),
+                                                                             n:new Nodo('FOR', [new Nodo($$[$0-8], null), new Nodo($$[$0-7], null), $$[$0-6].n, new Nodo($$[$0-5],null), $$[$0-4].n, new Nodo($$[$0-3], null), $$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])}
+break;
+case 69:
+this.$ = {s:new For($$[$0-6].s,$$[$0-4].s,$$[$0-2].s,$$[$0].s,this._$.first_line, this._$.first_column),
+                                                                            n:new Nodo('FOR', [new Nodo($$[$0-8], null), new Nodo($$[$0-7], null), $$[$0-6].n, new Nodo($$[$0-5],null), $$[$0-4].n, new Nodo($$[$0-3], null), $$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])}
 break;
 case 71:
-this.$ = new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column)
+this.$ = {s:new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($$[$0], null)])}
 break;
 case 72:
-this.$ = new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column)
+this.$ = {s:new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($$[$0], null)])}
 break;
 case 74:
-this.$=$$[$0];
+this.$={s:$$[$0].s,n:new Nodo('IF', [$$[$0].n])};
 break;
 case 75:
-$$[$0-1].push(...$$[$0]);
+this.$ = {s:$$[$0-1].s.push(...$$[$0].s), n:new Nodo('IF', [$$[$0-1].n, $$[$0].n])};
 break;
 case 76:
-this.$ = [{exp: null, block: $$[$0]}];
+this.$ = {s:[{exp: null, block: $$[$0].s}], n:new Nodo('ELSE', [new Nodo($$[$0-1], null), $$[$0].n])};
+break;
+case 77:
+this.$ = {s:$$[$0].s, n:new Nodo('ELSE', [new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 78:
-this.$ = [{exp: $$[$0-2], block: $$[$0]}];
+this.$ = {s:[{exp: $$[$0-2].s, block: $$[$0].s}],n:new Nodo('IFSOLO', [new Nodo($$[$0-4], null), new Nodo($$[$0-3], null), $$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 79:
-this.$ = new Switch($$[$0-4], $$[$0-1], null, this._$.first_line, this._$.first_column)
+this.$ = {s:new Switch($$[$0-4].s, $$[$0-1].s, null, this._$.first_line, this._$.first_column),n:new Nodo('SWITCH',[new Nodo($$[$0-6],null), new Nodo($$[$0-5], null), $$[$0-4].n, new Nodo($$[$0-3], null), new Nodo($$[$0-2], null), $$[$0-1].n, new Nodo($$[$0], null)])}
 break;
 case 80:
-this.$ = new Switch($$[$0-4], null, $$[$0-1], this._$.first_line, this._$.first_column)
+this.$ = {s:new Switch($$[$0-4].s, null, $$[$0-1].s, this._$.first_line, this._$.first_column),n:new Nodo('SWITCH',[new Nodo($$[$0-6],null), new Nodo($$[$0-5], null), $$[$0-4].n, new Nodo($$[$0-3], null), new Nodo($$[$0-2], null), $$[$0-1].n, new Nodo($$[$0], null)])}
 break;
 case 81:
-this.$ = new Switch($$[$0-5], $$[$0-2], $$[$0-1], this._$.first_line, this._$.first_column)
+this.$ = {s:new Switch($$[$0-5].s, $$[$0-2].s, $$[$0-1].s, this._$.first_line, this._$.first_column),n:new Nodo('SWITCH',[new Nodo($$[$0-7],null), new Nodo($$[$0-6], null), $$[$0-5].n, new Nodo($$[$0-4], null), new Nodo($$[$0-3], null), $$[$0-2].n, $$[$0-1].n, new Nodo($$[$0], null)])}
 break;
 case 82:
-$$[$0-4].push({exp:$$[$0-2], block:new Bloque($$[$0], this._$.first_line, this._$.first_column)})
+$$[$0-4].s.push({exp:$$[$0-2].s, block:new Bloque($$[$0].s, this._$.first_line, this._$.first_column)}); this.$ = {s:$$[$0-4].s, n:new Nodo('CASES', [$$[$0-4].n, new Nodo($$[$0-3], null), $$[$0-2].n , new Nodo($$[$0-1], null), $$[$0].n])}
 break;
 case 83:
-this.$ = [{exp: $$[$0-2], block: new Bloque($$[$0], this._$.first_line, this._$.first_column)}]
+this.$ = {s:[{exp: $$[$0-2].s, block: new Bloque($$[$0].s, this._$.first_line, this._$.first_column)}],n:new Nodo('CASES',[new Nodo($$[$0-3], null), $$[$0-2].n])}
 break;
 case 84:
-this.$ = new Bloque($$[$0], this._$.first_line, this._$.first_column)
+this.$ = {s:new Bloque($$[$0].s, this._$.first_line, this._$.first_column),n:new Nodo('DEFAULT',[new Nodo($$[$0-2],null),new Nodo($$[$0-1], null), $$[$0].n])}
 break;
 case 85:
-this.$ = new Logica($$[$0-2], $$[$0], Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 86:
-this.$ = new Logica($$[$0-2], $$[$0], Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 87:
-this.$ = new Unitaria($$[$0], Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column);
+this.$ = {s:new Unitaria($$[$0].s, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 88:
-this.$ = new Logica($$[$0-2], $$[$0], Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 89:
-this.$ = new Logica($$[$0-2], $$[$0], Type.DIFERENTE, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.DIFERENTE, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 90:
-this.$ = new Logica($$[$0-2], $$[$0], Type.MENOR, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.MENOR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 91:
-this.$ = new Logica($$[$0-2], $$[$0], Type.MAYOR, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.MAYOR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 92:
-this.$ = new Logica($$[$0-2], $$[$0], Type.MAYORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.MAYORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 93:
-this.$ = new Logica($$[$0-2], $$[$0], Type.MENORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Logica($$[$0-2].s, $$[$0].s, Type.MENORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
+break;
+case 94:
+this.$ = {s:$$[$0].s, n:new Nodo('EXPRL', [$$[$0].n])}
 break;
 case 95:
-this.$ = new Aritmetica($$[$0-2], $$[$0], Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Aritmetica($$[$0-2].s, $$[$0].s, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 96:
-this.$ = new Aritmetica($$[$0-2], $$[$0], Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Aritmetica($$[$0-2].s, $$[$0].s, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 97:
-this.$ = new Aritmetica($$[$0-2], $$[$0], Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Aritmetica($$[$0-2].s, $$[$0].s, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 98:
-this.$ = new Aritmetica($$[$0-2], $$[$0], Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Aritmetica($$[$0-2].s, $$[$0].s, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 99:
-this.$ = new Aritmetica($$[$0-2], $$[$0], Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Aritmetica($$[$0-2].s, $$[$0].s, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
 break;
 case 100:
-this.$ = new Aritmetica($$[$0-2], $$[$0], Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);
+this.$ = {s:new Aritmetica($$[$0-2].s, $$[$0].s, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column), n: new Nodo('EXP2', [$$[$0-2].n, new Nodo($$[$0-1], null), $$[$0].n])};
+break;
+case 101:
+this.$ = {s:$$[$0].s, n: new Nodo('EXP2',[$$[$0].n])}
 break;
 case 102:
-this.$ = new Unitaria($$[$0], Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column);
+this.$ = {s:new Unitaria($$[$0].s, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($$[$0-1], null), $$[$0].n])};
+break;
+case 103:
+this.$ = {s:$$[$0-1].s,n:new Nodo('EXPVAL', [new Nodo($$[$0-2], null),$$[$0-1],new Nodo($$[$0], null)])}
 break;
 case 104:
-this.$ = new Value($$[$0].value, $$[$0].type, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value($$[$0].s.value, $$[$0].s.type, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [$$[$0].n])};
 break;
 case 105:
-this.$ = new Value(String($$[$0]), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value(String($$[$0]), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($$[$0], null)])};
 break;
 case 106:
-this.$ = new Value(String($$[$0]), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value(String($$[$0]), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($$[$0], null)])};
 break;
 case 107:
-this.$ = new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($$[$0], null)])};
 break;
 case 108:
-this.$ = new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($$[$0], null)])};
 break;
 case 109:
-this.$ = new Symbol($$[$0], null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column );
+this.$ = {s:new Symbol($$[$0], null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($$[$0], null)])};
 break;
 case 110:
-this.$ = new Value(parseInt($$[$0]), Type.INT, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value(parseInt($$[$0]), Type.INT, Type.VALOR, this._$.first_line, this._$.first_column), n: new Nodo('NUM', [new Nodo($$[$0], null)])};
 break;
 case 111:
-this.$ =new Value(parseFloat($$[$0]), Type.DOUBLE, Type.VALOR, this._$.first_line, this._$.first_column);
+this.$ = {s:new Value(parseFloat($$[$0]), Type.DOUBLE, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('NUM', [new Nodo($$[$0], null)])};
 break;
 }
 },
@@ -549,6 +585,7 @@ _handle_error:
    const For = require('../clases/For.js')
    const Control = require('../clases/Control.js')
    const Switch = require('../clases/Switch.js')
+   const Nodo = require('../clases/Nodo.js')
    var program = new Global()
    var cadena ='';
 /* generated by jison-lex 0.3.4 */

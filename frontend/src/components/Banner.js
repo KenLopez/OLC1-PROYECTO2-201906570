@@ -31,9 +31,9 @@ function Banner(props) {
                   Abrir
                 </label>
                 </Menu.Item>
-                <Menu.Item className='opcion'>
+                {/*<Menu.Item className='opcion'>
                   <Button color='green' className={props.tab!==0?'disabled':''}>Guardar</Button>
-                </Menu.Item>
+              </Menu.Item>*/}
                 <Menu.Item className='opcion'>
                   <Button color='yellow' onClick={props.compilar} className={props.tab!==0?'disabled':''}>Compilar</Button> 
                 </Menu.Item>
@@ -42,6 +42,9 @@ function Banner(props) {
                 </Menu.Item>
                 <Menu.Item className='opcion'>
                   <Button color='violet' onClick={()=>{props.mode(2)}}>Símbolos</Button>
+                </Menu.Item>
+                <Menu.Item className='opcion'>
+                  <Button color='teal' onClick={()=>{props.mode(3)}}>AST</Button>
                 </Menu.Item>
                 <Menu.Item className='opcion'>
                   <Button color='red'>Gramaticas</Button>

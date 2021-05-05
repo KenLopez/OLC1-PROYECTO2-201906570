@@ -27,6 +27,7 @@ class Switch{
         }
         let current = ambito+'_'+Type.SWITCH
         let bandera = true
+        let local = new SymbolTable(table)
         for (let index = 0; index < this.condiciones.length; index++) {
             const condicion = this.condiciones[index]
             let res = condicion.ejecutar(table, global)
@@ -34,8 +35,7 @@ class Switch{
                 let pass = new Logica(val,res,Type.IGUAL,Type.LOGICO,condicion.fila, condicion.columna)
                 let tmp = pass.ejecutar(table,global, false)
                 if((tmp!=null) && tmp.value){
-                    console.log(this.bloques[index])
-                    let out = this.bloques[index].ejecutar(table, global, current)
+                    let out = this.bloques[index].ejecutar(local, global, current)
                     if (out == Type.ERROR) {
                         global.newError(Type.SEMANTICO, "No se pudo ejecutar la instrucción: "+this.type, condicion.fila, condicion.columna)
                         return Type.ERROR

@@ -16,6 +16,7 @@
    const For = require('../clases/For.js')
    const Control = require('../clases/Control.js')
    const Switch = require('../clases/Switch.js')
+   const Nodo = require('../clases/Nodo.js')
    var program = new Global()
    var cadena ='';
 %}
@@ -149,6 +150,7 @@
 
 INICIO
    :GLOBALES EOF {
+      program.ast = new Nodo('INICIO', [$1])
       var p = program
       program = new Global()
       p.ejecutar()
@@ -165,42 +167,42 @@ INICIO
 
 /*BLOQUE GLOBAL*/
 GLOBALES
-   :GLOBALES GLOBAL  {program.instrucciones.push($2);}
-   |GLOBAL           {program.instrucciones.push($1);}
+   :GLOBALES GLOBAL  {program.instrucciones.push($2.s); $$ = new Nodo('GLOBALES', [$1, $2.n])}
+   |GLOBAL           {program.instrucciones.push($1.s); $$ = new Nodo('GLOBALES', [$1.n])}
    |error SYNC       {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 GLOBAL
-   :DECLARACION SYNC    {$$ = $1}    
-   |ASIGNACION SYNC     {$$ = $1}     
+   :DECLARACION SYNC    {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n, $2.n])}}   
+   |ASIGNACION SYNC     {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n, $2.n])}}    
    //|FUNCION
-   |IF                  {$$ = new If($1,this._$.first_line, this._$.first_column);}                 
-   |SWITCH              {$$ = $1}
-   |WHILE               {$$ = $1}
-   |DOWHILE             {$$ = $1}
-   |FOR                 {$$ = $1}
-   |PRINT SYNC          {$$ = $1}
+   |IF                  {$$ = {s:new If($1.s,this._$.first_line, this._$.first_column),n:new Nodo('GLOBAL', [$1.n])};}                 
+   |SWITCH              {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
+   |WHILE               {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
+   |DOWHILE             {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
+   |FOR                 {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
+   |PRINT SYNC          {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n, $2.n])}}
    //|LLAMADA SYNC
    //|MAIN SYNC
 ;
 
 /*BLOQUE LOCAL*/
 INSTRUCCIONES
-   :INSTRUCCION INSTRUCCIONES    {$$=$2.unshift($1); $$ = $2;}
-   |INSTRUCCION                  {$$=[$1]}
+   :INSTRUCCION INSTRUCCIONES    {$2.s.unshift($1.s);$$={s:$2.s,n:new Nodo('INSTRUCCIONES', [$1.n, $2.n])}}
+   |INSTRUCCION                  {$$={s:[$1.s], n:new Nodo('INSTRUCCIONES', [$1.n])}}
    |error SYNC                   {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 INSTRUCCION
-   :DECLARACION SYNC    {$$ = $1;}
-   |ASIGNACION SYNC     {$$ = $1;}
-   |TRANSFERENCIA SYNC  {$$ = $1;}
-   |IF                  {$$ = new If($1,this._$.first_line, this._$.first_column);}
-   |SWITCH              {$$ = $1;}
-   |WHILE               {$$ = $1;}
-   |DOWHILE             {$$ = $1;}
-   |FOR                 {$$ = $1;}
-   |PRINT SYNC          {$$ = $1;}
+   :DECLARACION SYNC    {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
+   |ASIGNACION SYNC     {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
+   |TRANSFERENCIA SYNC  {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
+   |IF                  {$$ = {s:new If($1.s,this._$.first_line, this._$.first_column),n:new Nodo('INSTRUCCION', [$1.n])};}
+   |SWITCH              {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
+   |WHILE               {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
+   |DOWHILE             {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
+   |FOR                 {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
+   |PRINT SYNC          {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
    //|LLAMADA SYNC        {$$ = $1;}
    
 ;
@@ -208,19 +210,19 @@ INSTRUCCION
 
 
 BLOQUE
-   :llavea BLOQUE2         {$$= new Bloque($2, this._$.first_line, this._$.first_column);}
+   :llavea BLOQUE2         {$$= {s:new Bloque($2.s, this._$.first_line, this._$.first_column), n: new Nodo('BLOQUE', [new Nodo($1,null), $2.n])};}
 ;
 
 BLOQUE2
-   :INSTRUCCION BLOQUE2    {$2.unshift($1); $$ = $2;}
-   |llavec                 {$$=[];}
+   :INSTRUCCION BLOQUE2    {$2.s.unshift($1.s); $$ = {s:$2.s, n:new Nodo('BLOQUE2', [$1.n, $2.n])};}
+   |llavec                 {$$={s:[], n:new Nodo('BLOQUE2', [new Nodo($1, null)])};}
    |error SYNC             {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 /*FUNCIONES NATIVAS*/
 PRINT 
-   :print parena EXPRL parenc {$$ = new Print($3, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);}
-   |print parena parenc       {$$ = new Print(null, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column);}
+   :print parena EXPRL parenc {$$ = {s:new Print($3.s, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column),n:new Nodo('PRINT', [new Nodo($1,null),new Nodo($2, null), $3.n, new Nodo($4,null)])};}
+   |print parena parenc       {$$ = {s:new Print(null, Type.PRINT, Type.PRINT, this._$.first_line, this._$.first_column),n:new Nodo('PRINT', [new Nodo($1,null),new Nodo($2,null),new Nodo($3,null)])};}
 ;
 
 NATIVA
@@ -236,8 +238,8 @@ NATIVA
 
 /*VARIABLES*/
 DECLARACION
-   :TYPE id                                                                   {$$ = new Declaracion($2, null, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
-   |TYPE id igual EXPRL                                                       {$$ = new Declaracion($2, $4, $1, Type.DECLARACION, this._$.first_line, this._$.first_column)}
+   :TYPE id                                                                   {$$ = {s:new Declaracion($2, null, $1.s, Type.DECLARACION, this._$.first_line, this._$.first_column),n:new Nodo('DECLARACION', [$1.n, new Nodo($2, null)])}}
+   |TYPE id igual EXPRL                                                       {$$ = {s:new Declaracion($2, $4.s, $1.s, Type.DECLARACION, this._$.first_line, this._$.first_column),n:new Nodo('DECLARACION', [$1.n, new Nodo($2, null), new Nodo($3, null), $4.n])}}
    //|TYPE id igual CASTEO 
    //|TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
    //|TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
@@ -249,20 +251,20 @@ CASTEO
 ;
 
 ASIGNACION
-   :id igual EXPRL            {$$ = new Asignacion($1, $3, Type.ASIGNACION, this._$.first_line, this._$.first_column)}          
+   :id igual EXPRL            {$$ = {s:new Asignacion($1, $3.s, Type.ASIGNACION, this._$.first_line, this._$.first_column), n:new Nodo('ASIGNACION', [new Nodo($1, null), new Nodo($2, null), $3.n])}}          
    //|id igual CASTEO
-   |id incremento             {$$ = new Asignacion($1, null, Type.INCREMENTO, this._$.first_line, this._$.first_column)}
-   |id decremento             {$$ = new Asignacion($1, null, Type.DECREMENTO, this._$.first_line, this._$.first_column)} 
+   |id incremento             {$$ = {s:new Asignacion($1, null, Type.INCREMENTO, this._$.first_line, this._$.first_column),n:new Nodo('ASIGNACION', [new Nodo($1, null), new Nodo($2, null)])}}
+   |id decremento             {$$ = {s:new Asignacion($1, null, Type.DECREMENTO, this._$.first_line, this._$.first_column),n:new Nodo('ASIGNACION', [new Nodo($1, null), new Nodo($2, null)])}} 
    //|ACCESOVECTOR igual EXPRL 
    //|ACCESOLISTA igual EXPRL 
 ;
 
 TYPE
-   :tint          {$$ = Type.INT;}
-   |tstring       {$$ = Type.STRING;}
-   |tdouble       {$$ = Type.DOUBLE;}
-   |tbool         {$$ = Type.BOOLEAN;}
-   |tchar         {$$ = Type.CHAR;}
+   :tint          {$$ = {s:Type.INT,n:new Nodo('TYPE', [new Nodo($1,null)])};}
+   |tstring       {$$ = {s:Type.STRING,n:new Nodo('TYPE', [new Nodo($1,null)])};}
+   |tdouble       {$$ = {s:Type.DOUBLE,n:new Nodo('TYPE', [new Nodo($1,null)])};}
+   |tbool         {$$ = {s:Type.BOOLEAN,n:new Nodo('TYPE', [new Nodo($1,null)])};}
+   |tchar         {$$ = {s:Type.CHAR,n:new Nodo('TYPE', [new Nodo($1,null)])};}
 ;
 
 ACCESOVECTOR
@@ -275,7 +277,7 @@ ACCESOLISTA
 
 /*SIGNO DE SINCRONIZACIÓN*/
 SYNC
-   :ptcoma
+   :ptcoma {$$ = {s:$1, n:new Nodo('SYNC', [new Nodo($1, null)])}}
    |error {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
@@ -309,22 +311,25 @@ PARAM
 
 /*CICLOS*/
 WHILE 
-   :mientras parena EXPRL parenc BLOQUE   {$$ = new While($3, $5, this._$.first_line, this._$.first_column)}
+   :mientras parena EXPRL parenc BLOQUE   {$$ = {s:new While($3.s, $5.s, this._$.first_line, this._$.first_column),n:new Nodo('WHILE', [new Nodo($1,null), new Nodo($2,null), $3.n, new Nodo($4,null), $5.n])}}
 ;
 
 DOWHILE
-   :has BLOQUE mientras parena EXPRL parenc SYNC {$$ = new DoWhile($5, $2, this._$.first_line, this._$.first_column)}
+   :has BLOQUE mientras parena EXPRL parenc SYNC {$$ = {s:new DoWhile($5.s, $2.s, this._$.first_line, this._$.first_column), 
+                                                  n:new Nodo('DOWHILE',[new Nodo($1, null), $2.n, new Nodo($3,null), new Nodo($4,null),$5.n, new Nodo($6,null), $7.n])}}
 ;
 
 FOR 
-   :para parena ASIGNACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE    {$$ = new For($3,$5,$7,$9,this._$.first_line, this._$.first_column)}
-   |para parena DECLARACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE   {$$ = new For($3,$5,$7,$9,this._$.first_line, this._$.first_column)}
+   :para parena ASIGNACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE    {$$ = {s:new For($3.s,$5.s,$7.s,$9.s,this._$.first_line, this._$.first_column),
+                                                                             n:new Nodo('FOR', [new Nodo($1, null), new Nodo($2, null), $3.n, new Nodo($4,null), $5.n, new Nodo($6, null), $7.n, new Nodo($8, null), $9.n])}}
+   |para parena DECLARACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE   {$$ = {s:new For($3.s,$5.s,$7.s,$9.s,this._$.first_line, this._$.first_column),
+                                                                            n:new Nodo('FOR', [new Nodo($1, null), new Nodo($2, null), $3.n, new Nodo($4,null), $5.n, new Nodo($6, null), $7.n, new Nodo($8, null), $9.n])}}
 ;
 
 TRANSFERENCIA
    :retorno 
-   |continuar  {$$ = new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column)}
-   |romper     {$$ = new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column)}
+   |continuar  {$$ = {s:new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
+   |romper     {$$ = {s:new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
 ;
 
 
@@ -334,69 +339,69 @@ OPTERNARIO
 ;
 
 IF
-   :IFSOLO        {$$=$1;}            
-   |IFSOLO ELSE   {$1.push(...$2);}
+   :IFSOLO        {$$={s:$1.s,n:new Nodo('IF', [$1.n])};}            
+   |IFSOLO ELSE   {$$ = {s:$1.s.push(...$2.s), n:new Nodo('IF', [$1.n, $2.n])};}
 ;
 
 ELSE
-   :sino BLOQUE      {$$ = [{exp: null, block: $2}];}  
-   |sino IF          {$$ = $2;}
+   :sino BLOQUE      {$$ = {s:[{exp: null, block: $2.s}], n:new Nodo('ELSE', [new Nodo($1, null), $2.n])};}  
+   |sino IF          {$$ = {s:$2.s, n:new Nodo('ELSE', [new Nodo($1, null), $2.n])};}
 ;
 
 IFSOLO
-   :si parena EXPRL parenc BLOQUE   {$$ = [{exp: $3, block: $5}];}
+   :si parena EXPRL parenc BLOQUE   {$$ = {s:[{exp: $3.s, block: $5.s}],n:new Nodo('IFSOLO', [new Nodo($1, null), new Nodo($2, null), $3.n, new Nodo($4, null), $5.n])};}
 ;
 
 SWITCH
-   :fswitch parena EXPRL parenc llavea CASES llavec            {$$ = new Switch($3, $6, null, this._$.first_line, this._$.first_column)}
-   |fswitch parena EXPRL parenc llavea DEFAULT llavec          {$$ = new Switch($3, null, $6, this._$.first_line, this._$.first_column)}
-   |fswitch parena EXPRL parenc llavea CASES DEFAULT llavec    {$$ = new Switch($3, $6, $7, this._$.first_line, this._$.first_column)}
+   :fswitch parena EXPRL parenc llavea CASES llavec            {$$ = {s:new Switch($3.s, $6.s, null, this._$.first_line, this._$.first_column),n:new Nodo('SWITCH',[new Nodo($1,null), new Nodo($2, null), $3.n, new Nodo($4, null), new Nodo($5, null), $6.n, new Nodo($7, null)])}}
+   |fswitch parena EXPRL parenc llavea DEFAULT llavec          {$$ = {s:new Switch($3.s, null, $6.s, this._$.first_line, this._$.first_column),n:new Nodo('SWITCH',[new Nodo($1,null), new Nodo($2, null), $3.n, new Nodo($4, null), new Nodo($5, null), $6.n, new Nodo($7, null)])}}
+   |fswitch parena EXPRL parenc llavea CASES DEFAULT llavec    {$$ = {s:new Switch($3.s, $6.s, $7.s, this._$.first_line, this._$.first_column),n:new Nodo('SWITCH',[new Nodo($1,null), new Nodo($2, null), $3.n, new Nodo($4, null), new Nodo($5, null), $6.n, $7.n, new Nodo($8, null)])}}
 ;
 
 CASES
-   :CASES caso EXPRL dospt INSTRUCCIONES  {$1.push({exp:$3, block:new Bloque($5, this._$.first_line, this._$.first_column)})}
-   |caso EXPRL dospt INSTRUCCIONES        {$$ = [{exp: $2, block: new Bloque($4, this._$.first_line, this._$.first_column)}]}
+   :CASES caso EXPRL dospt INSTRUCCIONES  {$1.s.push({exp:$3.s, block:new Bloque($5.s, this._$.first_line, this._$.first_column)}); $$ = {s:$1.s, n:new Nodo('CASES', [$1.n, new Nodo($2, null), $3.n , new Nodo($4, null), $5.n])}}
+   |caso EXPRL dospt INSTRUCCIONES        {$$ = {s:[{exp: $2.s, block: new Bloque($4.s, this._$.first_line, this._$.first_column)}],n:new Nodo('CASES',[new Nodo($1, null), $2.n])}}
 ;
 
 DEFAULT
-   :defecto dospt INSTRUCCIONES           {$$ = new Bloque($3, this._$.first_line, this._$.first_column)}
+   :defecto dospt INSTRUCCIONES           {$$ = {s:new Bloque($3.s, this._$.first_line, this._$.first_column),n:new Nodo('DEFAULT',[new Nodo($1,null),new Nodo($2, null), $3.n])}}
 ;
 
 
 /*EXPRESIONES Y VALORES*/
 EXPRL
    ://OPTERNARIO
-   EXPRL ologico EXPRL       {$$ = new Logica($1, $3, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXPRL ylogico EXPRL       {$$ = new Logica($1, $3, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |exclamacion EXPRL         {$$ = new Unitaria($2, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column);}
-   |EXPRL equals EXPRL        {$$ = new Logica($1, $3, Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXPRL diferente EXPRL     {$$ = new Logica($1, $3, Type.DIFERENTE, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXPRL menor EXPRL         {$$ = new Logica($1, $3, Type.MENOR, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXPRL mayor EXPRL         {$$ = new Logica($1, $3, Type.MAYOR, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXPRL mayorigual EXPRL    {$$ = new Logica($1, $3, Type.MAYORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXPRL menorigual EXPRL    {$$ = new Logica($1, $3, Type.MENORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column);}
-   |EXP2                      {$$ = $1}
+   EXPRL ologico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL ylogico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |exclamacion EXPRL         {$$ = {s:new Unitaria($2.s, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [new Nodo($1, null), $2.n])};}
+   |EXPRL equals EXPRL        {$$ = {s:new Logica($1.s, $3.s, Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL diferente EXPRL     {$$ = {s:new Logica($1.s, $3.s, Type.DIFERENTE, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL menor EXPRL         {$$ = {s:new Logica($1.s, $3.s, Type.MENOR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL mayor EXPRL         {$$ = {s:new Logica($1.s, $3.s, Type.MAYOR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL mayorigual EXPRL    {$$ = {s:new Logica($1.s, $3.s, Type.MAYORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL menorigual EXPRL    {$$ = {s:new Logica($1.s, $3.s, Type.MENORIGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXP2                      {$$ = {s:$1.s, n:new Nodo('EXPRL', [$1.n])}}
 ;
 
 EXP2
-   :EXPRL mas EXPRL           {$$ = new Aritmetica($1, $3, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL menos EXPRL         {$$ = new Aritmetica($1, $3, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL por EXPRL           {$$ = new Aritmetica($1, $3, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL dividido EXPRL      {$$ = new Aritmetica($1, $3, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL modulo EXPRL        {$$ = new Aritmetica($1, $3, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPRL elevado EXPRL       {$$ = new Aritmetica($1, $3, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column);}
-   |EXPVAL                    {$$ = $1}
+   :EXPRL mas EXPRL           {$$ = {s:new Aritmetica($1.s, $3.s, Type.SUMA, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL menos EXPRL         {$$ = {s:new Aritmetica($1.s, $3.s, Type.RESTA, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL por EXPRL           {$$ = {s:new Aritmetica($1.s, $3.s, Type.MULTIPLICACION, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL dividido EXPRL      {$$ = {s:new Aritmetica($1.s, $3.s, Type.DIVISION, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL modulo EXPRL        {$$ = {s:new Aritmetica($1.s, $3.s, Type.MODULO, Type.ARITMETICO, this._$.first_line, this._$.first_column),n: new Nodo('EXP2', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPRL elevado EXPRL       {$$ = {s:new Aritmetica($1.s, $3.s, Type.POTENCIA, Type.ARITMETICO, this._$.first_line, this._$.first_column), n: new Nodo('EXP2', [$1.n, new Nodo($2, null), $3.n])};}
+   |EXPVAL                    {$$ = {s:$1.s, n: new Nodo('EXP2',[$1.n])}}
 ;
 
 EXPVAL
-   :menos EXPRL            {$$ = new Unitaria($2, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column);}
-   |parena EXPRL parenc    {$$ = $2}
-   |NUM                    {$$ = new Value($1.value, $1.type, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |cadena                 {$$ = new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |caracter               {$$ = new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |vtrue                  {$$ = new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |vfalse                 {$$ = new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |id                     {$$ = new Symbol($1, null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column );}
+   :menos EXPRL            {$$ = {s:new Unitaria($2.s, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null), $2.n])};}
+   |parena EXPRL parenc    {$$ = {s:$2.s,n:new Nodo('EXPVAL', [new Nodo($1, null),$2,new Nodo($3, null)])}}
+   |NUM                    {$$ = {s:new Value($1.s.value, $1.s.type, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [$1.n])};}
+   |cadena                 {$$ = {s:new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
+   |caracter               {$$ = {s:new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
+   |vtrue                  {$$ = {s:new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
+   |vfalse                 {$$ = {s:new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
+   |id                     {$$ = {s:new Symbol($1, null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
    //|ACCESOVECTOR
    //|ACCESOLISTA
    //|NATIVA
@@ -404,7 +409,6 @@ EXPVAL
 ;
 
 NUM
-   :entero  {$$ = new Value(parseInt($1), Type.INT, Type.VALOR, this._$.first_line, this._$.first_column);}
-   |decimal {$$ =new Value(parseFloat($1), Type.DOUBLE, Type.VALOR, this._$.first_line, this._$.first_column);}
+   :entero  {$$ = {s:new Value(parseInt($1), Type.INT, Type.VALOR, this._$.first_line, this._$.first_column), n: new Nodo('NUM', [new Nodo($1, null)])};}
+   |decimal {$$ = {s:new Value(parseFloat($1), Type.DOUBLE, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('NUM', [new Nodo($1, null)])};}
 ;
-

@@ -5,6 +5,7 @@ import Banner from './components/Banner';
 import Editor from './components/Editor';
 import Reporte from './components/Reporte';
 import TablaSymbolos from './components/TablaSymbolos';
+import AST from './components/AST';
 const axios = require('axios').default
 
 function App() {
@@ -15,23 +16,29 @@ function App() {
   const [consola, setConsola] = useState('')
   const [errores, setErrores] = useState([])
   const [symbols, setSymbols] = useState([])
+  const [ast, setAst] = useState(null)
   const [tab, setTab] = useState(0)
   //const [file, setFile] = useState(null)
   var compilar = ()=>{
+    setAst(null)
     var data = ''
     var errores = []
     var simbolos = []
+    let imagen = null
     async function enviar(){
         let res = await axios.post("http://localhost:3000/compilar", {codigo: currentText});
         data = String(res.data.data)
         errores = res.data.errores
         simbolos = res.data.symbols
-        if (errores.length>0) {
-          setTab(1);
-        }
+        imagen = res.data.ast
         setConsola(String(data))  
         setErrores(errores) 
         setSymbols(simbolos)
+        if (res.data.ast!= null) {
+          setAst("data:image/png;base64,"+imagen) 
+        }else{
+          setAst(null)
+        }
     }
     enviar()
   }
@@ -111,6 +118,12 @@ function App() {
                   <>
                   <TablaSymbolos
                   symbols={symbols}
+                  />
+                  </>
+                ):tab===3?(
+                  <>
+                  <AST
+                  ast={ast}
                   />
                   </>
                 ):(
