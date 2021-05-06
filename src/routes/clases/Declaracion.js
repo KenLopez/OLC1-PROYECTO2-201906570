@@ -50,19 +50,32 @@ class Declaracion{
                                 }
                                 break
                             case Type.STRING:
-                                if (v.type == Type.CHAR) {
-                                    v.type = this.type   
-                                }
+                                break
                             case Type.INT:
-                                if(v.type == Type.CHAR){
-                                    v.type = this.type
-                                    v.value = v.value.charCodeAt(0)
-                                }else if(v.type == Type.BOOLEAN){
+                                if(v.type == Type.BOOLEAN){
                                     v.type = this.type
                                     v.value = v.value?1:0
                                 }else if(v.type == Type.DOUBLE){
                                     v.type = this.type
                                     v.value = Math.trunc(v.value)
+                                }
+                            case Type.BOOLEAN:
+                                if(v.type == Type.INT){
+                                    if (v.value == 0) {
+                                        v.type = Type.BOOLEAN
+                                        v.value = false
+                                    }else if (v.value == 1) {
+                                        v.type = Type.BOOLEAN
+                                        v.value = false
+                                    }
+                                }else if (v.type == Type.DOUBLE) {
+                                    if (v.value == 0) {
+                                        v.type = Type.BOOLEAN
+                                        v.value = false
+                                    }else if (v.value == 1) {
+                                        v.type = Type.BOOLEAN
+                                        v.value = false
+                                    }
                                 }
                             default:
                                 break;
@@ -76,6 +89,9 @@ class Declaracion{
                             global.newError(Type.SEMANTICO,'No se pudo declarar: '+ this.id + ', ya fue declarado.', this.fila, this.columna)
                             return Type.ERROR
                         }
+                    }else{
+                        global.newError(Type.SEMANTICO, 'No se pudo asignar, tipos incompatibles.', _fila, _columna)
+                        return Type.ERROR
                     }
                 }
                 global.newError(Type.SEMANTICO, "No se pudo asignar valor, null pointer exception.", this.fila, this.columna)

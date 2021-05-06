@@ -49,7 +49,7 @@ class If{
             }
         }
         if (bandera && this.else !=null) {
-            let res = this.else.ejecutar(this.symbolTable, global, current)
+            let res = this.else.ejecutar(new SymbolTable(table), global, current)
             if (res == Type.ERROR) {
                 return Type.ERROR
             }else if (res == Type.BREAK) {

@@ -31,6 +31,7 @@ function Editor(props) {
                 style={{minHeight:500, maxHeight:500, fontFamily:"consolas"}} 
                 onChange={props.updateText}
                 spellCheck={false}
+                wrap={'off'}
                 />
             </Form>
             </Grid.Column>
@@ -46,6 +47,7 @@ function Editor(props) {
                 disabled value={props.consola} 
                 style={{minHeight:555, maxHeight:555, fontFamily:"consolas"}}
                 spellCheck = {false}
+                wrap={'off'}
                 />
             </Form>
             </Grid.Column>

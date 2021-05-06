@@ -56,5 +56,6 @@ const Type = {
     RETURN:             'RETURN',
     CONTINUE:           'CONTINUE',
     CONTROL:            'CONTROL',
+    LLAMADA:            'LLAMADA',
 }
 module.exports = Type;

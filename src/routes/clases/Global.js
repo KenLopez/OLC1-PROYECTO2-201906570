@@ -6,12 +6,19 @@ class Global{
     constructor(){
         this.instrucciones = []
         this.exec = null
-        this.funciones = []
         this.symbolTable = new SymbolTable(null)
         this.symbols = []
         this.errores = []
         this.ast = null
         this.output = ''
+    }
+
+    newExec(llamada){
+        if (this.exec == null) {
+            this.exec = llamada
+        }else{
+            this.newError(Type.SEMANTICO, 'No se puede declarar más de un exec.', llamada.fila, llamada.columna)
+        }
     }
 
     graficar(){
@@ -97,6 +104,12 @@ class Global{
             let res = instruccion.ejecutar(this.symbolTable, this, Type.GLOBAL)
             if (res == Type.ERROR) {
                 break
+            }
+        }
+        if (this.exec != null){
+            let res = this.exec.ejecutar(this.symbolTable, this)
+            if (res == Type.ERROR){
+                this.errores.newError(Type.SEMANTICO, 'No se pudo ejecutar método EXEC', this.exec.fila, this.exec.columna)
             }
         }
     }

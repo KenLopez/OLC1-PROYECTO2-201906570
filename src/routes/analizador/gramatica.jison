@@ -17,6 +17,8 @@
    const Control = require('../clases/Control.js')
    const Switch = require('../clases/Switch.js')
    const Nodo = require('../clases/Nodo.js')
+   const Funcion = require('../clases/Funcion.js')
+   const Call = require('../clases/Call.js')
    var program = new Global()
    var cadena ='';
 %}
@@ -107,8 +109,9 @@
 <str>"\\\""                                             {cadena += '\"';}
 <str>"\\n"                                              {cadena += '\n';}
 <str>"\\t"                                              {cadena += '\t';}
+<str>"\\r"                                              {cadena += '\r';}
 <str>"\\\\"                                             {cadena += '\\';}
-<str>"\\\'"                                             {cadena += '\'';}
+<str>"\\'"                                             {cadena += '\'';}
 <str>["]                                                {yytext = cadena; this.popState(); return 'cadena'}
 <str>.                                                  {cadena=''; this.popState();program.newError(
                                                          Type.LEXICO, 'El símbolo: '+cadena+', no se pudo'+
@@ -167,43 +170,42 @@ INICIO
 
 /*BLOQUE GLOBAL*/
 GLOBALES
-   :GLOBALES GLOBAL  {program.instrucciones.push($2.s); $$ = new Nodo('GLOBALES', [$1, $2.n])}
-   |GLOBAL           {program.instrucciones.push($1.s); $$ = new Nodo('GLOBALES', [$1.n])}
-   |error SYNC       {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
+   :GLOBALES GLOBAL  {$$ = new Nodo('GLOBALES', [$1, $2])}
+   |GLOBAL           {$$ = new Nodo('GLOBALES', [$1])}
+   |error            {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 GLOBAL
-   :DECLARACION SYNC    {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n, $2.n])}}   
-   |ASIGNACION SYNC     {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n, $2.n])}}    
-   //|FUNCION
-   |IF                  {$$ = {s:new If($1.s,this._$.first_line, this._$.first_column),n:new Nodo('GLOBAL', [$1.n])};}                 
-   |SWITCH              {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
-   |WHILE               {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
-   |DOWHILE             {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
-   |FOR                 {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n])}}
-   |PRINT SYNC          {$$ = {s:$1.s, n:new Nodo('GLOBAL', [$1.n, $2.n])}}
-   //|LLAMADA SYNC
-   //|MAIN SYNC
+   :DECLARACION SYNC    {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}   
+   |ASIGNACION SYNC     {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}    
+   |FUNCION             {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   |IF                  {program.instrucciones.push(new If($1.s,this._$.first_line, this._$.first_column)); $$ = new Nodo('GLOBAL', [$1.n])}                 
+   |SWITCH              {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   |WHILE               {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   |DOWHILE             {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   |FOR                 {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   |PRINT SYNC          {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}
+   |MAIN SYNC           {program.newExec($1.s); $$ = new Nodo('GLOBAL', [$1.n,$2.n])}
 ;
 
 /*BLOQUE LOCAL*/
 INSTRUCCIONES
    :INSTRUCCION INSTRUCCIONES    {$2.s.unshift($1.s);$$={s:$2.s,n:new Nodo('INSTRUCCIONES', [$1.n, $2.n])}}
    |INSTRUCCION                  {$$={s:[$1.s], n:new Nodo('INSTRUCCIONES', [$1.n])}}
-   |error SYNC                   {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
+   |error                        {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 INSTRUCCION
    :DECLARACION SYNC    {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
    |ASIGNACION SYNC     {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
    |TRANSFERENCIA SYNC  {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
-   |IF                  {$$ = {s:new If($1.s,this._$.first_line, this._$.first_column),n:new Nodo('INSTRUCCION', [$1.n])};}
+   |IF                  {$$ = {s:new If($1.s,this._$.first_line, this._$.first_column),n:new Nodo('INSTRUCCION', [$1.n])}}
    |SWITCH              {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
    |WHILE               {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
    |DOWHILE             {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
    |FOR                 {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
    |PRINT SYNC          {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
-   //|LLAMADA SYNC        {$$ = $1;}
+   |LLAMADA SYNC        {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
    
 ;
 
@@ -216,7 +218,7 @@ BLOQUE
 BLOQUE2
    :INSTRUCCION BLOQUE2    {$2.s.unshift($1.s); $$ = {s:$2.s, n:new Nodo('BLOQUE2', [$1.n, $2.n])};}
    |llavec                 {$$={s:[], n:new Nodo('BLOQUE2', [new Nodo($1, null)])};}
-   |error SYNC             {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
+   |error                  {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 /*FUNCIONES NATIVAS*/
@@ -284,29 +286,29 @@ SYNC
 
 /*FUNCIONES*/
 MAIN
-   :ex LLAMADA
+   :ex LLAMADA    {$$ = {s:$2.s,n:new Nodo('MAIN', [new Nodo($1, null), $2.n])}}
 ;
 
 LLAMADA
-   :id parena LISTAVALORES parenc
-   |id parena parenc
+   :id parena LISTAVALORES parenc   {$$ = {s:new Call($1, $3.s, this._$.first_line, this._$.first_column),n:new Nodo('LLAMADA', [new Nodo($1,null), new Nodo($2, null), $3.n, new Nodo($4, null)])};}
+   |id parena parenc                {$$ = {s:new Call($1, [], this._$.first_line, this._$.first_column),n:new Nodo('LLAMADA', [new Nodo($1,null), new Nodo($2, null), new Nodo($3, null)])}}
 ;
 
 LISTAVALORES
-   :LISTAVALORES coma EXPRL
-   |EXPRL
+   :LISTAVALORES coma EXPRL   {$1.s.push($3.s),$$ ={s:$1.s,n:new Nodo('LISTAVALORES', [$1.n, new Nodo($2, null), $3.n])}}
+   |EXPRL                     {$$ = {s:[$1.s],n:new Nodo('LISTAVALORES', [$1.n])}}
 ;
 
 FUNCION
-   :TYPE id parena PARAM parenc BLOQUE
-   |TYPE id parena parenc BLOQUE
-   |tmethod id parena PARAM parenc BLOQUE
-   |tmethod id parena parenc BLOQUE
+   ://TYPE id parena PARAM parenc BLOQUE
+   //|TYPE id parena parenc BLOQUE
+   /*|*/tmethod id parena PARAM parenc BLOQUE      {$$={s: new Funcion($2,$4.s,$6.s,Type.METODO,Type.FUNCION,this._$.first_line, this._$.first_column),n:new Nodo('FUNCION',[new Nodo($1,null), new Nodo($2,null), new Nodo($3,null), $4.n,new Nodo($5,null), $6.n])}}
+   |tmethod id parena parenc BLOQUE                {$$={s: new Funcion($2,[],$5.s,Type.METODO,Type.FUNCION,this._$.first_line, this._$.first_column),n:new Nodo('FUNCION',[new Nodo($1,null), new Nodo($2,null), new Nodo($3,null),new Nodo($4,null), $5.n])}}
 ;
 
 PARAM
-   :PARAM coma TYPE id
-   |TYPE id 
+   :PARAM coma TYPE id     {$1.s.push({id: $4, type: $3.s}); $$ = {s:$1.s,n:new Nodo('PARAM', [$1.n, new Nodo($2, null), $3.n, new Nodo($4, null)])}}
+   |TYPE id                {$$ = {s:[{id: $2, type: $1.s}],n:new Nodo('PARAM', [$1.n, new Nodo($2, null)])}} 
 ;
 
 /*CICLOS*/
@@ -339,13 +341,13 @@ OPTERNARIO
 ;
 
 IF
-   :IFSOLO        {$$={s:$1.s,n:new Nodo('IF', [$1.n])};}            
-   |IFSOLO ELSE   {$$ = {s:$1.s.push(...$2.s), n:new Nodo('IF', [$1.n, $2.n])};}
+   :IFSOLO        {$$ = {s:$1.s,n:new Nodo('IF', [$1.n])};}            
+   |IFSOLO ELSE   {$1.s.push(...($2.s));$$ = {s:$1.s, n:new Nodo('IF', [$1.n, $2.n])};}
 ;
 
 ELSE
    :sino BLOQUE      {$$ = {s:[{exp: null, block: $2.s}], n:new Nodo('ELSE', [new Nodo($1, null), $2.n])};}  
-   |sino IF          {$$ = {s:$2.s, n:new Nodo('ELSE', [new Nodo($1, null), $2.n])};}
+   |sino IF          {$$ = {s:$2.s, n:new Nodo('ELSE', [new Nodo($1, null), $2.n])}}
 ;
 
 IFSOLO
@@ -395,10 +397,10 @@ EXP2
 
 EXPVAL
    :menos EXPRL            {$$ = {s:new Unitaria($2.s, Type.NEGACION, Type.UNITARIA, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null), $2.n])};}
-   |parena EXPRL parenc    {$$ = {s:$2.s,n:new Nodo('EXPVAL', [new Nodo($1, null),$2,new Nodo($3, null)])}}
+   |parena EXPRL parenc    {$$ = {s:$2.s,n:new Nodo('EXPVAL', [new Nodo($1, null),$2.n,new Nodo($3, null)])}}
    |NUM                    {$$ = {s:new Value($1.s.value, $1.s.type, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [$1.n])};}
-   |cadena                 {$$ = {s:new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
-   |caracter               {$$ = {s:new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
+   |cadena                 {$$ = {s:new Value(String($1), Type.STRING, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo("\\\""+$1+"\\\"", null)])};}
+   |caracter               {$$ = {s:new Value(String($1), Type.CHAR, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo("\\\'"+$1+"\\\'", null)])};}
    |vtrue                  {$$ = {s:new Value(true, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column),n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
    |vfalse                 {$$ = {s:new Value(false, Type.BOOLEAN, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
    |id                     {$$ = {s:new Symbol($1, null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($1, null)])};}

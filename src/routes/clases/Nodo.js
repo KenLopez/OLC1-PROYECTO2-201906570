@@ -17,6 +17,7 @@ class Nodo{
             let enlaces = ''
             for (let index = 0; index < this.sons.length; index++) {
                 const son = this.sons[index];
+                console.log(son)
                 enlaces+=tag+"->nodo"+counter.counter+"\n"
                 let tmp = son.graficar(counter)
                 nodos+=tmp.nodos
