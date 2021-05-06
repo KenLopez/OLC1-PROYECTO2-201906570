@@ -302,8 +302,8 @@ LISTAVALORES
 FUNCION
    ://TYPE id parena PARAM parenc BLOQUE
    //|TYPE id parena parenc BLOQUE
-   /*|*/tmethod id parena PARAM parenc BLOQUE      {$$={s: new Funcion($2,$4.s,$6.s,Type.METODO,Type.FUNCION,this._$.first_line, this._$.first_column),n:new Nodo('FUNCION',[new Nodo($1,null), new Nodo($2,null), new Nodo($3,null), $4.n,new Nodo($5,null), $6.n])}}
-   |tmethod id parena parenc BLOQUE                {$$={s: new Funcion($2,[],$5.s,Type.METODO,Type.FUNCION,this._$.first_line, this._$.first_column),n:new Nodo('FUNCION',[new Nodo($1,null), new Nodo($2,null), new Nodo($3,null),new Nodo($4,null), $5.n])}}
+   /*|*/tmethod id parena PARAM parenc BLOQUE      {$$={s: new Funcion($2,$4.s,$6.s,Type.VOID,Type.FUNCION,this._$.first_line, this._$.first_column),n:new Nodo('FUNCION',[new Nodo($1,null), new Nodo($2,null), new Nodo($3,null), $4.n,new Nodo($5,null), $6.n])}}
+   |tmethod id parena parenc BLOQUE                {$$={s: new Funcion($2,[],$5.s,Type.VOID,Type.FUNCION,this._$.first_line, this._$.first_column),n:new Nodo('FUNCION',[new Nodo($1,null), new Nodo($2,null), new Nodo($3,null),new Nodo($4,null), $5.n])}}
 ;
 
 PARAM
@@ -372,8 +372,9 @@ DEFAULT
 
 /*EXPRESIONES Y VALORES*/
 EXPRL
-   ://OPTERNARIO
-   EXPRL ologico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
+   :CASTEO
+   //|OPTERNARIO
+   |EXPRL ologico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
    |EXPRL ylogico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
    |exclamacion EXPRL         {$$ = {s:new Unitaria($2.s, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [new Nodo($1, null), $2.n])};}
    |EXPRL equals EXPRL        {$$ = {s:new Logica($1.s, $3.s, Type.IGUAL, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}

@@ -73,7 +73,8 @@ class Call{
                         if ((res != Type.ERROR) && (res != null)) {
                             let cast = this.casteoImplicito(symbol.type, res)
                             if (cast != Type.ERROR) {
-                                newTable.newSymbol(symbol.id, cast, symbol.type, Type.VARIABLE,param.fila, param.columna)    
+                                newTable.newSymbol(symbol.id, cast, symbol.type, Type.VARIABLE,param.fila, param.columna)
+                                global.newSymbol(symbol.id, symbol.type, Type.PARAMETRO, Type.FUNCION+'_'+funcion.id, param.fila, param.columna)    
                             }else{
                                 var requeridos = ''
                                 var obtenidos = ''

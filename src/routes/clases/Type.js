@@ -57,5 +57,7 @@ const Type = {
     CONTINUE:           'CONTINUE',
     CONTROL:            'CONTROL',
     LLAMADA:            'LLAMADA',
+    PARAMETRO:          'PARAMETRO',
+    VOID:               'VOID',
 }
 module.exports = Type;

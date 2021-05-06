@@ -24,7 +24,7 @@ class Funcion{
             aux.push(element)
         }
         if (tabla.newSymbol(this.id, {params: this.params, block:this.block}, this.type, Type.FUNCION, this.fila, this.columna)) {
-            global.newSymbol(this.id,this.type, Type.FUNCION, ambito, this.fila, this.columna)
+            global.newSymbol(this.id,Type.VOID, Type.FUNCION, ambito, this.fila, this.columna)
             return null
         }else{
             global.newError(Type.SEMANTICO,'No se pudo declarar: '+ this.id + ', ya fue declarado.', this.fila, this.columna)
