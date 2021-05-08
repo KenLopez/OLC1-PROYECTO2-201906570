@@ -83,8 +83,10 @@ class SymbolTable{
                             _value.type = s.type
                             _value.value = _value.value?1:0
                         }else if(_value.type == Type.DOUBLE){
-                            _value.type = s.type
-                            _value.value = Math.trunc(_value.value)
+                            if (Number.isInteger(_value.value)) {
+                                _value.type = s.type
+                                _value.value = Math.trunc(_value.value)   
+                            }   
                         }
                         break
                     case Type.BOOLEAN:
@@ -107,14 +109,16 @@ class SymbolTable{
                         }
                         break
                     default:
-                        global.newError(Type.SEMANTICO, 'No se pudo asignar, tipos incompatibles.', _fila, _columna)
-                        return false
+                        break
                 }
             }
             if (_value.type == s.type) {
                 s.value = new Value(_value.value, _value.type, _value.typeExp,_value.fila, 
                     _value.columna)
                 return true
+            }else{
+                global.newError(Type.SEMANTICO, 'No se pudo asignar, tipos incompatibles: '+s.type + ' y ' + _value.type, _fila, _columna)
+                return false
             }
         }else{
             global.newError(Type.SEMANTICO, _id + ' no está definido.', _fila, _columna)

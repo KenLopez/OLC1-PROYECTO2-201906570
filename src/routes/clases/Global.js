@@ -22,6 +22,9 @@ class Global{
     }
 
     graficar(){
+        if((this.errores.length>0)||(this.ast == null)){
+            return null
+        }
         var counter = {counter:0}
         let tmp = this.ast.graficar(counter)
         let data = tmp.nodos+"\n"+tmp.enlaces
@@ -109,7 +112,7 @@ class Global{
         if (this.exec != null){
             let res = this.exec.ejecutar(this.symbolTable, this)
             if (res == Type.ERROR){
-                this.errores.newError(Type.SEMANTICO, 'No se pudo ejecutar método EXEC', this.exec.fila, this.exec.columna)
+                this.newError(Type.SEMANTICO, 'No se pudo ejecutar método EXEC', this.exec.fila, this.exec.columna)
             }
         }
     }

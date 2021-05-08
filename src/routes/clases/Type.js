@@ -59,5 +59,12 @@ const Type = {
     LLAMADA:            'LLAMADA',
     PARAMETRO:          'PARAMETRO',
     VOID:               'VOID',
+    TOLOWER:            'TOLOWER',
+    TOUPPER:            'TOUPPER',
+    TRUNCATE:           'TRUNCATE',
+    ROUND:              'ROUND',
+    TYPEOF:             'TYPEOF',
+    TOSTRING:           'TOSTRING',
+    LENGTH:             'LENGTH',
 }
 module.exports = Type;

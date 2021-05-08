@@ -23,7 +23,7 @@ class DoWhile{
                 }
                 while (this.condicion.ejecutar(table, global).value) {
                     res = this.bloque.ejecutar(new SymbolTable(table),global, current)
-                    if (res == Type.ERROR) {
+                    if ((res == Type.ERROR)&&(res!=null)) {
                         global.newError(Type.SEMANTICO, 'No se pudo realizar la instruccion: '+this.type,this.fila, this.columna)
                         return Type.ERROR
                     }else if (res == Type.BREAK) {

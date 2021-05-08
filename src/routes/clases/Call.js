@@ -18,7 +18,10 @@ class Call{
             case Type.INT:
                 switch (value.type) {
                     case Type.DOUBLE:
-                        return new Value(Math.trunc(value.value), Type.INT, value.typeExp, value.fila, value.columna)
+                        if(Number.isInteger(value.value)){
+                            return new Value(Math.trunc(value.value), Type.INT, value.typeExp, value.fila, value.columna)
+                        }
+                        return Type.ERROR
                     case Type.BOOLEAN:
                         return new Value(value.value?1:0, Type.INT, value.typeExp, value.fila, value.columna)
                     default:

@@ -19,6 +19,9 @@
    const Nodo = require('../clases/Nodo.js')
    const Funcion = require('../clases/Funcion.js')
    const Call = require('../clases/Call.js')
+   const Ternario = require('../clases/Ternario.js')
+   const Casteo = require('../clases/Casteo.js')
+   const Nativa = require('../clases/Nativa.js')
    var program = new Global()
    var cadena ='';
 %}
@@ -160,6 +163,7 @@ INICIO
       return p;
    }
    |EOF{
+      program.ast = null
       var p = program
       program = new Global()
       p.ejecutar()
@@ -172,20 +176,20 @@ INICIO
 GLOBALES
    :GLOBALES GLOBAL  {$$ = new Nodo('GLOBALES', [$1, $2])}
    |GLOBAL           {$$ = new Nodo('GLOBALES', [$1])}
-   |error            {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
+   |error               {program.newError(Type.SINTACTICO, "No se esperaba: " + $$, this._$.first_line, this._$.first_column)}
 ;
 
 GLOBAL
    :DECLARACION SYNC    {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}   
    |ASIGNACION SYNC     {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}    
    |FUNCION             {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
-   |IF                  {program.instrucciones.push(new If($1.s,this._$.first_line, this._$.first_column)); $$ = new Nodo('GLOBAL', [$1.n])}                 
-   |SWITCH              {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
-   |WHILE               {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
-   |DOWHILE             {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
-   |FOR                 {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
-   |PRINT SYNC          {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}
-   |MAIN SYNC           {program.newExec($1.s); $$ = new Nodo('GLOBAL', [$1.n,$2.n])}
+   //|IF                  {program.instrucciones.push(new If($1.s,this._$.first_line, this._$.first_column)); $$ = new Nodo('GLOBAL', [$1.n])}                 
+   //|SWITCH              {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   //|WHILE               {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   //|DOWHILE             {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   //|FOR                 {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n])}
+   //|PRINT SYNC          {program.instrucciones.push($1.s); $$ = new Nodo('GLOBAL', [$1.n, $2.n])}
+   |EXEC SYNC           {program.newExec($1.s); $$ = new Nodo('GLOBAL', [$1.n,$2.n])}
 ;
 
 /*BLOQUE LOCAL*/
@@ -206,7 +210,6 @@ INSTRUCCION
    |FOR                 {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n])};}
    |PRINT SYNC          {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
    |LLAMADA SYNC        {$$ = {s:$1.s,n:new Nodo('INSTRUCCION', [$1.n, $2.n])};}
-   
 ;
 
 
@@ -228,33 +231,31 @@ PRINT
 ;
 
 NATIVA
-   :minusculas parena EXPRL parenc
-   |mayusculas parena EXPRL parenc
-   |tamanio parena EXPRL parenc
-   |truncar parena EXPRL parenc
-   |redondear parena EXPRL parenc
-   |typeOf parena EXPRL parenc
-   |acadena parena EXPRL parenc
-   |aarreglo parena EXPRL parenc
+   :minusculas parena EXPRL parenc     {$$ = {s:new Nativa($3.s, Type.TOLOWER, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   |mayusculas parena EXPRL parenc     {$$ = {s:new Nativa($3.s, Type.TOUPPER, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   |tamanio parena EXPRL parenc        {$$ = {s:new Nativa($3.s, Type.LENGTH, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   |truncar parena EXPRL parenc        {$$ = {s:new Nativa($3.s, Type.TRUNCATE, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   |redondear parena EXPRL parenc      {$$ = {s:new Nativa($3.s, Type.ROUND, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   |typeOf parena EXPRL parenc         {$$ = {s:new Nativa($3.s, Type.TYPEOF, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   |acadena parena EXPRL parenc        {$$ = {s:new Nativa($3.s, Type.TOSTRING, this._$.first_line, this._$.first_column), n:new Nodo('NATIVA', [new Nodo($1, null), new Nodo($2, null), $3.n ,new Nodo($4)])}}
+   //|aarreglo parena EXPRL parenc
 ;
 
 /*VARIABLES*/
 DECLARACION
    :TYPE id                                                                   {$$ = {s:new Declaracion($2, null, $1.s, Type.DECLARACION, this._$.first_line, this._$.first_column),n:new Nodo('DECLARACION', [$1.n, new Nodo($2, null)])}}
    |TYPE id igual EXPRL                                                       {$$ = {s:new Declaracion($2, $4.s, $1.s, Type.DECLARACION, this._$.first_line, this._$.first_column),n:new Nodo('DECLARACION', [$1.n, new Nodo($2, null), new Nodo($3, null), $4.n])}}
-   //|TYPE id igual CASTEO 
    //|TYPE corchetea corchetec id igual nuevo TYPE corchetea EXPRL corchetec
    //|TYPE corchetea corchetec id igual llavea LISTAVALORES llavec
    //|tlista TYPE id igual nuevo tlista menor TYPE mayor   
 ;
 
 CASTEO
-   :parena TYPE parenc EXPRL
+   :parena TYPE parenc EXPRL  {$$ = {s:new Casteo($2.s, $4.s, Type.CASTEO, this._$.first_line, this._$.first_column),n:new Nodo('CASTEO', [new Nodo($1, null), $2.n, new Nodo($3, null), $4.n])}}
 ;
 
 ASIGNACION
    :id igual EXPRL            {$$ = {s:new Asignacion($1, $3.s, Type.ASIGNACION, this._$.first_line, this._$.first_column), n:new Nodo('ASIGNACION', [new Nodo($1, null), new Nodo($2, null), $3.n])}}          
-   //|id igual CASTEO
    |id incremento             {$$ = {s:new Asignacion($1, null, Type.INCREMENTO, this._$.first_line, this._$.first_column),n:new Nodo('ASIGNACION', [new Nodo($1, null), new Nodo($2, null)])}}
    |id decremento             {$$ = {s:new Asignacion($1, null, Type.DECREMENTO, this._$.first_line, this._$.first_column),n:new Nodo('ASIGNACION', [new Nodo($1, null), new Nodo($2, null)])}} 
    //|ACCESOVECTOR igual EXPRL 
@@ -285,8 +286,8 @@ SYNC
 
 
 /*FUNCIONES*/
-MAIN
-   :ex LLAMADA    {$$ = {s:$2.s,n:new Nodo('MAIN', [new Nodo($1, null), $2.n])}}
+EXEC
+   :ex LLAMADA    {$$ = {s:$2.s,n:new Nodo('EXEC', [new Nodo($1, null), $2.n])}}
 ;
 
 LLAMADA
@@ -323,21 +324,21 @@ DOWHILE
 
 FOR 
    :para parena ASIGNACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE    {$$ = {s:new For($3.s,$5.s,$7.s,$9.s,this._$.first_line, this._$.first_column),
-                                                                             n:new Nodo('FOR', [new Nodo($1, null), new Nodo($2, null), $3.n, new Nodo($4,null), $5.n, new Nodo($6, null), $7.n, new Nodo($8, null), $9.n])}}
+                                                                            n:new Nodo('FOR', [new Nodo($1, null), new Nodo($2, null), $3.n, new Nodo($4,null), $5.n, new Nodo($6, null), $7.n, new Nodo($8, null), $9.n])}}
    |para parena DECLARACION ptcoma EXPRL ptcoma ASIGNACION parenc BLOQUE   {$$ = {s:new For($3.s,$5.s,$7.s,$9.s,this._$.first_line, this._$.first_column),
                                                                             n:new Nodo('FOR', [new Nodo($1, null), new Nodo($2, null), $3.n, new Nodo($4,null), $5.n, new Nodo($6, null), $7.n, new Nodo($8, null), $9.n])}}
 ;
 
 TRANSFERENCIA
-   :retorno 
-   |continuar  {$$ = {s:new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
+   ://retorno 
+   /*|*/continuar  {$$ = {s:new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
    |romper     {$$ = {s:new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
 ;
 
 
 /*SENTENCIAS DE CONTROL Y OPERADOR TERNARIO*/
 OPTERNARIO
-   :EXPRL interrog EXPRL dospt EXPRL
+   :EXPRL interrog EXPRL dospt EXPRL   {$$ = {s:new Ternario($1.s,$3.s,$5.s,this._$.first_line, this._$.first_column),n:new Nodo('OPTERNARIO', [$1.n, new Nodo($2,null),$3.n,new Nodo($4,null),$5.n])}}
 ;
 
 IF
@@ -372,8 +373,8 @@ DEFAULT
 
 /*EXPRESIONES Y VALORES*/
 EXPRL
-   :CASTEO
-   //|OPTERNARIO
+   :CASTEO                    {$$ = {s:$1.s, n: new Nodo('EXPRL', [$1.n])}}
+   |OPTERNARIO                {$$ = {s:$1.s, n: new Nodo('EXPRL', [$1.n])}}
    |EXPRL ologico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.OR, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
    |EXPRL ylogico EXPRL       {$$ = {s:new Logica($1.s, $3.s, Type.AND, Type.LOGICO, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [$1.n, new Nodo($2, null), $3.n])};}
    |exclamacion EXPRL         {$$ = {s:new Unitaria($2.s, Type.NOT, Type.UNITARIA, this._$.first_line, this._$.first_column),n: new Nodo('EXPRL', [new Nodo($1, null), $2.n])};}
@@ -407,7 +408,7 @@ EXPVAL
    |id                     {$$ = {s:new Symbol($1, null, Type.SYMBOL, Type.VALOR, this._$.first_line, this._$.first_column), n:new Nodo('EXPVAL', [new Nodo($1, null)])};}
    //|ACCESOVECTOR
    //|ACCESOLISTA
-   //|NATIVA
+   |NATIVA                 {$$ = {s:$1.s, n:new Nodo('EXPVAL', [$1.n])}}
    //|LLAMADA
 ;
 

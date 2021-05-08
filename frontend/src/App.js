@@ -92,6 +92,7 @@ function App() {
             setCurrentText={setCurrentText}
             mode={mode}
             tab={tab}
+            currentText={currentText}
           />
           <div className='Content'>
             <br/>

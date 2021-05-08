@@ -12,7 +12,7 @@ class While{
     ejecutar(table, global, ambito){
         let current = ambito+'_'+Type.WHILE
         let v = this.condicion.ejecutar(table, global)
-        if (v!=Type.ERROR){
+        if ((v!=Type.ERROR)&&(v!=null)){
             if (v.type == Type.BOOLEAN){
                 while (this.condicion.ejecutar(table, global).value) {
                     let res = this.bloque.ejecutar(new SymbolTable(table),global,current)

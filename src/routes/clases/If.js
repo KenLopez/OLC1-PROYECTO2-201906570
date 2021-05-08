@@ -25,7 +25,7 @@ class If{
         for (let index = 0; index < this.condiciones.length; index++) {
             const condicion = this.condiciones[index]
             let res = condicion.ejecutar(table, global)
-            if (res!=Type.ERROR) {
+            if ((res!=Type.ERROR) && (res !=null)) {
                 if (res.type == Type.BOOLEAN) {
                     if (res.value) {
                         let res = this.bloques[index].ejecutar(new SymbolTable(table), global, current)

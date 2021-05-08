@@ -56,9 +56,12 @@ class Declaracion{
                                     v.type = this.type
                                     v.value = v.value?1:0
                                 }else if(v.type == Type.DOUBLE){
-                                    v.type = this.type
-                                    v.value = Math.trunc(v.value)
+                                    if (Number.isInteger(v.value)) {
+                                        v.type = this.type
+                                        v.value = Math.trunc(v.value)   
+                                    }
                                 }
+                                break
                             case Type.BOOLEAN:
                                 if(v.type == Type.INT){
                                     if (v.value == 0) {
@@ -77,6 +80,7 @@ class Declaracion{
                                         v.value = false
                                     }
                                 }
+                                break
                             default:
                                 break;
                         }
@@ -90,7 +94,7 @@ class Declaracion{
                             return Type.ERROR
                         }
                     }else{
-                        global.newError(Type.SEMANTICO, 'No se pudo asignar, tipos incompatibles.', _fila, _columna)
+                        global.newError(Type.SEMANTICO, 'No se pudo asignar, tipos incompatibles: '+this.type + ' y ' + v.type, this.fila, this.columna)
                         return Type.ERROR
                     }
                 }

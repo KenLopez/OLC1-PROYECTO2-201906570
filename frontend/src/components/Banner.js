@@ -31,9 +31,18 @@ function Banner(props) {
                   Abrir
                 </label>
                 </Menu.Item>
-                {/*<Menu.Item className='opcion'>
-                  <Button color='green' className={props.tab!==0?'disabled':''}>Guardar</Button>
-              </Menu.Item>*/}
+                <Menu.Item className='opcion'>
+                  <Button color='green' className={props.tab!==0?'disabled':''} onClick={()=>{
+                    const url = window.URL.createObjectURL(
+                      new Blob([props.currentText], {type:'text/plain'})
+                    )
+                    const link = document.createElement('a')
+                    link.href = url
+                    link.setAttribute('download', 'Archivo.ty')
+                    document.body.appendChild(link)
+                    link.click()
+                  }}>Guardar</Button>
+              </Menu.Item>
                 <Menu.Item className='opcion'>
                   <Button color='yellow' onClick={props.compilar} className={props.tab!==0?'disabled':''}>Compilar</Button> 
                 </Menu.Item>
