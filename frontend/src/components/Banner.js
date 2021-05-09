@@ -10,7 +10,7 @@ function Banner(props) {
             </Header>
             <Menu inverted borderless className="Nav">
                 <Menu.Item className='opcion'>
-                  <Button color='blue' onClick={()=>{props.mode(0)}}>Código</Button> 
+                  <Button color='teal' onClick={()=>{props.mode(0)}}>Código</Button> 
                 </Menu.Item>
                 <Menu.Item className='opcion'>
                 <input type="file" class="inputfile" accept='.ty' onChange={
@@ -53,7 +53,7 @@ function Banner(props) {
                   <Button color='violet' onClick={()=>{props.mode(2)}}>Símbolos</Button>
                 </Menu.Item>
                 <Menu.Item className='opcion'>
-                  <Button color='teal' onClick={()=>{props.mode(3)}}>AST</Button>
+                  <Button color='red' onClick={()=>{props.mode(3)}}>AST</Button>
                 </Menu.Item>
                 {/*<Menu.Item className='opcion'>
                   <Button color='red'>Gramaticas</Button>

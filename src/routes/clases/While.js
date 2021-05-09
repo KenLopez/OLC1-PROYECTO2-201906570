@@ -21,6 +21,8 @@ class While{
                         return Type.ERROR
                     }else if (res == Type.BREAK) {
                         break
+                    }else if((res != null) && (res.type == Type.RETURN)){
+                        return res
                     }
                 }
                 return null

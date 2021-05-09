@@ -42,6 +42,8 @@ class Switch{
                     }else if (out == Type.BREAK) {
                         bandera = false
                         break                        
+                    }else if((res != null) && (res.type == Type.RETURN)){
+                        return res
                     }
                 }
             }else{

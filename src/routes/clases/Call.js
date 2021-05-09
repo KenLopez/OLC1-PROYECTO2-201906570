@@ -95,11 +95,32 @@ class Call{
                             return Type.ERROR
                         }
                     }
-                    let res = funcion.value.block.ejecutar(newTable, global, Type.FUNCION+'_'+funcion.id)
+                    let entorno = (funcion.type==Type.VOID)?Type.METODO:Type.FUNCION
+                    let res = funcion.value.block.ejecutar(newTable, global, entorno+'_'+funcion.id)
                     if (res==Type.ERROR) {
                         return Type.ERROR
+                    }else if((res != null) && (res.type == Type.RETURN)){
+                        if (funcion.type == Type.VOID) {
+                            if(res.value != null){
+                                global.newError(Type.SEMANTICO, 'Un método no puede devolver ningún valor.', res.fila, res.columna)
+                                return Type.ERROR
+                            }
+                            return null
+                        }else{
+                            let v = this.casteoImplicito(funcion.type, res.value)
+                            if (funcion.type == v.type) {
+                                return v
+                            }
+                            global.newError(Type.SEMANTICO, 'No se pudo retornar valor, tipos incompatibles, se esperaba valor: '+funcion.type+', se obtuvo: '+v.type+'.', param.fila, param.columna)
+                            return Type.ERROR
+                        }
                     }else{
-                        return null
+                        if (funcion.type == Type.VOID) {
+                            return null   
+                        }else{
+                            global.newError(Type.SEMANTICO, 'Una función debe retornar algún valor.', funcion.fila, funcion.columna)
+                            return Type.ERROR
+                        }
                     }
                 }else{
                     var requeridos = ''

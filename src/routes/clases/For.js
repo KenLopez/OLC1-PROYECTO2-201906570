@@ -33,6 +33,8 @@ class For{
                         return Type.ERROR
                     }else if (res == Type.BREAK) {
                         break
+                    }else if((res != null) && (res.type == Type.RETURN)){
+                        return res
                     }
                     let tmp = new SymbolTable(table)
                     tmp.symbols.push(newTable.find(this.symbol.id))

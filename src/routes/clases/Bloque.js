@@ -19,6 +19,8 @@ class Bloque{
                 return Type.BREAK
             }else if (res == Type.CONTINUE) {
                 return Type.CONTINUE
+            }else if((res != null) && (res.type == Type.RETURN)){
+                return res
             }
         }
         return null
