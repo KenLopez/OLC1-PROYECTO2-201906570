@@ -12,12 +12,16 @@ class Symbol{
 
     ejecutar(tabla, global){
         this.value = tabla.find(this.id)
-        if (this.value == Type.ERROR) {
+        if ((this.value == Type.ERROR)||(this.value == null)) {
             global.newError(Type.SEMANTICO, this.id + ' no está definido.', this.fila, this.columna)
             return Type.ERROR
         }
+        if(this.value.type == Type.VOID){
+            global.newError(Type.SEMANTICO, 'No se puede usar VOID como valor.', this.fila, this.columna)
+            return Type.ERROR
+        }
         var v = this.value.value.ejecutar(tabla, global)
-        if (v == Type.ERROR) {
+        if ((v == Type.ERROR)||(v==null)) {
             global.newError(Type.SEMANTICO, 'No se pudo obtener el valor de '+this.id+' , null pointer exception.', this.fila, this.columna)
             return Type.ERROR
         }

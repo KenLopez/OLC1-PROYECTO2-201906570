@@ -55,9 +55,9 @@ function Banner(props) {
                 <Menu.Item className='opcion'>
                   <Button color='teal' onClick={()=>{props.mode(3)}}>AST</Button>
                 </Menu.Item>
-                <Menu.Item className='opcion'>
+                {/*<Menu.Item className='opcion'>
                   <Button color='red'>Gramaticas</Button>
-                </Menu.Item>
+                </Menu.Item>*/}
             </Menu>
         </Segment>
     )

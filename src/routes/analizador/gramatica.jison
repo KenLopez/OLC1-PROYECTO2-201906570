@@ -75,7 +75,7 @@
 "double"                                        return 'tdouble';
 "boolean"                                       return 'tbool';
 "char"                                          return 'tchar';
-"list"                                          return 'tlista';
+//"list"                                          return 'tlista';
 "string"                                        return 'tstring';
 "print"                                         return 'print';
 "true"                                          return 'vtrue';
@@ -91,7 +91,7 @@
 "exec"                                          return 'ex';
 "void"                                          return 'tmethod';
 "return"                                        return 'retorno';
-"new"                                           return 'nuevo';
+//"new"                                           return 'nuevo';
 "break"                                         return 'romper';
 "continue"                                      return 'continuar';
 "toLower"                                       return 'minusculas';
@@ -270,13 +270,13 @@ TYPE
    |tchar         {$$ = {s:Type.CHAR,n:new Nodo('TYPE', [new Nodo($1,null)])};}
 ;
 
-ACCESOVECTOR
+/*ACCESOVECTOR
    :id corchetea EXPRL corchetec 
 ;
 
 ACCESOLISTA
    :id corchetea corchetea EXPRL corchetec corchetec
-;
+;*/
 
 /*SIGNO DE SINCRONIZACIÓN*/
 SYNC
@@ -330,8 +330,8 @@ FOR
 ;
 
 TRANSFERENCIA
-   ://retorno 
-   /*|*/continuar  {$$ = {s:new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
+   :/*retorno 
+   |*/continuar  {$$ = {s:new Control(Type.CONTINUE,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
    |romper     {$$ = {s:new Control(Type.BREAK,Type.CONTROL, this._$.first_line, this._$.first_column),n:new Nodo('TRANSFERENCIA', [new Nodo($1, null)])}}
 ;
 
