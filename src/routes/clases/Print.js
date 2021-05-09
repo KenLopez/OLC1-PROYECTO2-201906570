@@ -1,4 +1,5 @@
 const Type = require('./Type.js')
+const Value = require('./Value.js')
 class Print{
     constructor(_value, _type,_typeExp, _fila, _columna){
         this.value = _value
@@ -6,6 +7,9 @@ class Print{
         this.type = _type
         this.fila = _fila
         this.columna = _columna
+        if(this.value == null){
+            this.value = new Value('',Type.STRING, Type.VALOR, this.fila, this.columna)
+        }
     }
 
     ejecutar(tabla, global){
